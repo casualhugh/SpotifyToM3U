@@ -31,9 +31,9 @@ Once the application is installed, open it and follow these steps:
 
 ## Pictures
 
-![first](https://github.com/TypNull/SpotifyToM3U/assets/136082098/3a30fcd0-f753-404e-af1b-4f7c22542257)
+![first](https://imgur.com/rqYzI1C)
 
-![second](https://github.com/TypNull/SpotifyToM3U/assets/136082098/7e874877-8d41-4264-9225-70ec8ed6f721)
+![second](https://imgur.com/vXnAF7K)
 
 ## Support
 
