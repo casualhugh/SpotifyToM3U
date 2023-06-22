@@ -31,9 +31,9 @@ Once the application is installed, open it and follow these steps:
 
 ## Pictures
 
-![first](https://imgur.com/rqYzI1C)
+![first](https://i.imgur.com/rqYzI1C.png)
 
-![second](https://imgur.com/vXnAF7K)
+![second](https://i.imgur.com/vXnAF7K.png)
 
 ## Support
 
