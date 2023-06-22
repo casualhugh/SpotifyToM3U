@@ -36,8 +36,6 @@ namespace SpotifyToM3U
             services.AddSingleton<Func<Type, ViewModelObject>>(provider => viewModelType => (ViewModelObject)provider.GetRequiredService(viewModelType));
 
             _serviceProvider = services.BuildServiceProvider();
-
-
         }
 
         protected override void OnStartup(StartupEventArgs e)

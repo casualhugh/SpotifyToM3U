@@ -29,6 +29,12 @@ Once the application is installed, open it and follow these steps:
 3. Click on the "Convert" button to start the conversion process.
 4. Then the converted M3U8 playlist file can be exported.
 
+## Pictures
+
+<img align="right" src="https://github.com/TypNull/SpotifyToM3U/assets/136082098/3a30fcd0-f753-404e-af1b-4f7c22542257" alt="picture" width="200"/>
+
+<img align="right" src="https://github.com/TypNull/SpotifyToM3U/assets/136082098/7e874877-8d41-4264-9225-70ec8ed6f721" alt="picture" width="200"/>
+
 ## Support
 
 If you encounter any issues while using this application, please create an issue on the repository page. We will do our best to address your concerns as soon as possible.
