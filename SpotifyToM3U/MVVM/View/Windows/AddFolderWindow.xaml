@@ -1,0 +1,98 @@
+﻿<Window x:Class="SpotifyToM3U.MVVM.View.Windows.AddFolderWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows" xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:AddFolderVM}"
+        mc:Ignorable="d"
+        Title="AddFolderWindow" Height="185" Width="420"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        DataContext="{Binding}"
+        ShowInTaskbar="False"
+        Background="Transparent"
+        PreviewKeyDown="CloseOnEsc">
+    <Border Background="White" CornerRadius="10" >
+        <Grid Background="Transparent">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition/>
+            </Grid.ColumnDefinitions>
+            <Button Grid.Column="1" 
+                    Command="{Binding BrowseCommand}"
+                    Style="{StaticResource MenuButtonStyle}" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1"
+                    Background="#FFA0E2A0" 
+                    Tag="#FF70C870" 
+                    Content="Browse..."
+                    HorizontalAlignment="Left" 
+                    Margin="10,14,0,0" 
+                    VerticalAlignment="Top"
+                    Width="75"
+                    Height="20"/>
+            <StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Folder"
+                       HorizontalAlignment="Left" 
+                       Margin="10,10,0,0" 
+                       VerticalAlignment="Top" 
+                       RenderTransformOrigin="0.254,0.064" 
+                       Height="26" 
+                       Width="43"/>
+                    <TextBox Style="{StaticResource ModernTextBox}"
+                        HorizontalAlignment="Left"
+                        Height="23" Margin="28,16,0,0" TextWrapping="Wrap" Text="{Binding Path}" VerticalAlignment="Top" Width="208" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" MaxLines="1" TabIndex="1"/>
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label 
+                   Content="Extensions" 
+                        Margin="10,10,0,0" 
+                   HorizontalAlignment="Left"
+                   VerticalAlignment="Top" Height="26"
+                   Width="66"/>
+
+                    <TextBox Style="{StaticResource ModernTextBox}"
+                        Margin="5,16,0,0" HorizontalAlignment="Left"   TextWrapping="Wrap" Text="{Binding Extensions}" VerticalAlignment="Top" Width="208" TabIndex="3" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal">
+                    <Label Content="Search in subdirectories also"
+                       HorizontalAlignment="Left" 
+                       Margin="10,10,0,0" 
+                       VerticalAlignment="Top" 
+                       RenderTransformOrigin="0.254,0.064" 
+                       Height="26" />
+                    <ToggleButton Style="{StaticResource ModernRadioButton}"
+                          HorizontalAlignment="Left" 
+                          VerticalAlignment="Top"
+                                   Margin="10,10,0,0" 
+                          TabIndex="4"
+                          IsChecked="{Binding ScanSubdirectories}"/>
+                </StackPanel>
+            </StackPanel>
+
+
+            <Button Grid.Column="1" 
+                    Style="{StaticResource MenuButtonStyle}" 
+                    BorderBrush="Gray" 
+                    BorderThickness="1"
+                    Background="#FFE2A0CD" 
+
+                    Command="{Binding QuitCommand}"
+                    Tag="#FFD15BAB" 
+                    Content="Quit"
+                    HorizontalAlignment="Right" 
+                    Margin="0,0,10,10" 
+                    VerticalAlignment="Bottom"
+                    Width="50"
+                    Height="20"/>
+
+
+            <Button  Style="{StaticResource MenuButtonStyle}"
+                     Command="{Binding ScanCommand}" Tag="#FF7A92DF" BorderBrush="Gray" BorderThickness="1" Background="#FFBDA0E2" Content="Scan" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="75" Height="20" TabIndex="5" Margin="0,0,0,30" IsDefault="True"/>
+            
+            
+        </Grid>
+    </Border>
+</Window>

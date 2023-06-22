@@ -1,0 +1,29 @@
+﻿<Application x:Class="SpotifyToM3U.App"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:local="clr-namespace:SpotifyToM3U"
+               xmlns:view="clr-namespace:SpotifyToM3U.MVVM.View"
+             xmlns:vm="clr-namespace:SpotifyToM3U.MVVM.ViewModel">
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceDictionary Source="/Styles/Window/ModernWindowStyleLight.xaml" />
+                <ResourceDictionary Source="/Styles/ModernScrollBarSytle.xaml" />
+                <ResourceDictionary Source="/Styles/MainMenuButtonStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ButtonStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ModernContextMenuStyle.xaml" />
+                <ResourceDictionary Source="/Styles/CheckBoxStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ModernTextBoxStyle.xaml" />
+            </ResourceDictionary.MergedDictionaries>
+            <DataTemplate DataType="{x:Type  vm:LibraryVM}">
+                <view:LibraryView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type  vm:SpotifyVM}">
+                <view:SpotifyView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type  vm:ExportVM}">
+                <view:ExportView/>
+            </DataTemplate>
+        </ResourceDictionary>
+    </Application.Resources>
+</Application>

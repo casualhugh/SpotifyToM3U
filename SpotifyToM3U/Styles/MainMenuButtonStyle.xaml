@@ -1,0 +1,48 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                      xmlns:ext="clr-namespace:SpotifyToM3U.Core">
+    <Style BasedOn="{StaticResource {x:Type ToggleButton}}"
+           TargetType="{x:Type RadioButton}"
+           x:Key="MainMenuButton">
+        <Style.Setters>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="RadioButton">
+                        <Grid VerticalAlignment="Stretch"
+                              HorizontalAlignment="Stretch">
+                            <Border Background="{TemplateBinding Background}"
+                                    CornerRadius="5" BorderThickness="1"  BorderBrush="Gray"/>
+                            <Image Margin="15,10,10,10" HorizontalAlignment="Left" RenderOptions.BitmapScalingMode="Fant" Source="{Binding Path=(ext:MarkupExtensions.Icon), RelativeSource={RelativeSource TemplatedParent}}"/>
+                            <TextBlock Text="{TemplateBinding Property=Content}" VerticalAlignment="Center"
+                                       Margin="60,0,0,0"/>
+                        </Grid>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+
+            <Setter Property="Background" Value="LightGray"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush EndPoint="1,0" StartPoint="0,1">
+                        <GradientStop Color="Transparent"/>
+                        <GradientStop Color="LightGray" Offset="0.4"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style.Setters>
+
+        <Style.Triggers>
+            <Trigger Property="IsChecked" Value="True">
+                <Setter Property="Background">
+                    <Setter.Value>
+                        <LinearGradientBrush EndPoint="1,0" StartPoint="0,1">
+                            <GradientStop Color="Transparent"/>
+                            <GradientStop Color="#FFAEF79C" Offset="0.4"/>
+                        </LinearGradientBrush>
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+
+    </Style>
+</ResourceDictionary>

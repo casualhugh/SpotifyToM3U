@@ -1,0 +1,75 @@
+﻿<Window x:Class="SpotifyToM3U.MVVM.View.Windows.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows" xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainVM}"
+        mc:Ignorable="d"
+        xmlns:ext="clr-namespace:SpotifyToM3U.Core" xmlns:con="clr-namespace:SpotifyToM3U.Core.Converter"
+        Style="{StaticResource ModernWindowStyleLight}"
+        Title="Spotify to M3U" Height="450" Width="800"
+        Icon="\Recources\Images\spotify_icon.png">
+    <Window.TaskbarItemInfo>
+        <TaskbarItemInfo Description="Application to convert Spotify playlists to local playlists" 
+                     ProgressValue="{Binding ProgressValue,Mode=OneWay}" ProgressState="{Binding TaskbarState,Mode=OneWay}">
+        </TaskbarItemInfo>
+    </Window.TaskbarItemInfo>
+    <Grid>
+        <Grid.Resources>
+            <con:MultiValueEqualityConverter x:Key="converter" />
+        </Grid.Resources>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <StackPanel Margin="15,0,0,0" Orientation="Horizontal" Grid.Row="0">
+            <StackPanel.Resources>
+                <Style TargetType="{x:Type RadioButton}"
+                       BasedOn="{StaticResource MainMenuButton}">
+                    <Setter Property="IsChecked">
+                        <Setter.Value>
+                            <MultiBinding Converter="{StaticResource converter}"
+                                          Mode="OneWay">
+                                <Binding Path="CurrentName"
+                                         Mode="OneWay" />
+                                <Binding Path="CommandParameter"
+                                         RelativeSource="{RelativeSource Self}"
+                                         Mode="OneWay" />
+                            </MultiBinding>
+                        </Setter.Value>
+                    </Setter>
+                    <Setter Property="Command"
+                            Value="{Binding ChangeViewCommand}" />
+                    <Setter Property="Cursor"
+                            Value="Hand" />
+                    <Setter Property="Height"
+                            Value="40" />
+                    <Setter Property="Width"
+                            Value="120" />
+                    <Setter Property="FontSize"
+                            Value="14" />
+                    <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
+                            Value="True" />
+                </Style>
+            </StackPanel.Resources>
+            <RadioButton Content="Library"
+                          ext:MarkupExtensions.Icon="\Recources\Images\library.png"
+                         Margin="60,-45,0,0"
+                         CommandParameter="LibraryVM">
+            </RadioButton>
+            <RadioButton Content="Spotify"
+                         IsEnabled="{Binding EnableSpotify}"
+                         Margin="5,-45,0,0"
+                          ext:MarkupExtensions.Icon="\Recources\Images\spotify.png"
+                         CommandParameter="SpotifyVM" />
+            <RadioButton Content="Export"
+                         Margin="5,-45,0,0"
+                         IsEnabled="{Binding EnableExport}"
+                          ext:MarkupExtensions.Icon="\Recources\Images\export.png"
+                         CommandParameter="ExportVM" />
+        </StackPanel>
+        <ContentControl Grid.Row="1"
+                        Margin="10,0,10,10"
+                        Content="{Binding Navigation.CurrentView}" />
+    </Grid>
+</Window>
