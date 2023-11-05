@@ -1,6 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace SpotifyToM3U.MVVM.Model
@@ -17,7 +18,9 @@ namespace SpotifyToM3U.MVVM.Model
             {
                 TagLib.File file = TagLib.File.Create(Location);
                 _title = file.Tag.Title;
+                _cutTitle = IOManager.CutString(file.Tag.Title);
                 _artists = file.Tag.Performers.Length > 0 ? file.Tag.Performers : new string[] { "" };
+                _cutArtists = _artists.Select(IOManager.CutString).ToArray();
                 _album = file.Tag.Album;
                 _genre = file.Tag.Genres.Length > 0 ? file.Tag.Genres[0] : "";
                 _year = file.Tag.Year;
@@ -37,6 +40,8 @@ namespace SpotifyToM3U.MVVM.Model
             }
         }
 
+
+
         public string Extension { get; set; } = string.Empty;
         public string Location { get; set; } = string.Empty;
         public List<int> Tags { get; set; } = new();
@@ -44,7 +49,11 @@ namespace SpotifyToM3U.MVVM.Model
         [ObservableProperty]
         private string _title = string.Empty;
         [ObservableProperty]
+        private string _cutTitle = string.Empty;
+        [ObservableProperty]
         private string[] _artists = new string[] { "" };
+        [ObservableProperty]
+        private string[] _cutArtists = new string[] { "" };
         [ObservableProperty]
         private string _genre = string.Empty;
         [ObservableProperty]
@@ -54,6 +63,5 @@ namespace SpotifyToM3U.MVVM.Model
 
         [XmlIgnore]
         public ConcurrentDictionary<Track, double> TrackValueDictionary { get; } = new();
-
     }
 }

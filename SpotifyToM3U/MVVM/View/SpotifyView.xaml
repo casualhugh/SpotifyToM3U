@@ -61,7 +61,7 @@
                                     />
                                     </Border.Background>
                                 </Border>
-                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="WordEllipsis" FontSize="15" FontFamily="Segoe UI Symbol"/>
+                                <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding Title}" VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="WordEllipsis" FontSize="15" FontFamily="Segoe UI Symbol"/>
                                 <StackPanel Margin="10,5,10,5" VerticalAlignment="Top" Grid.Row="1" Grid.ColumnSpan="2"  >
                                     <StackPanel Orientation="Horizontal" >
                                         <TextBlock  Grid.Column="0" Text="Artist: " VerticalAlignment="Center" TextAlignment="Center" TextWrapping="Wrap" TextTrimming="WordEllipsis" FontSize="11" FontFamily="Typo Round Regular Demo"/>

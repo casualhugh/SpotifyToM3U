@@ -1,9 +1,8 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DownloaderLibrary;
-using DownloaderLibrary.Base.Request;
 using DownloaderLibrary.Web;
 using Microsoft.Extensions.DependencyInjection;
+using Requests;
 using SpotifyToM3U.Core;
 using SpotifyToM3U.MVVM.Model;
 using System;
@@ -146,47 +145,54 @@ namespace SpotifyToM3U.MVVM.ViewModel
             });
         }
 
-        private async Task FindTracksLocal(Track[] tracks)
+        private async Task FindTracksLocal(Track[] spotifyTracks)
         {
             RequestContainer<OwnRequest> container = new();
 
-            foreach (Track track in tracks)
+            foreach (Track track in spotifyTracks)
             {
-                container.Add(new((t) =>
+                container.Add((OwnRequest)new((t) =>
                 {
                     IEnumerable<AudioFile> found = _libraryVM.AudioFiles.Where(audio =>
                     {
-                        int index1 = audio.Title.LastIndexOf("-");
-                        int index2 = track.Name.LastIndexOf("-");
-
-                        double title = CalculateSimilarity(index1 > 3 ? audio.Title?.Remove(index1).ToLower() : audio.Title?.ToLower()
-                            , index2 > 3 ? track.Name?.Remove(index2).ToLower() : track.Name?.ToLower());
+                        double title = CalculateSimilarity(audio.CutTitle, track.CutTitle);
                         if (title < 0.5)
                             return false;
 
-                        double firstArtist = CalculateSimilarity(audio.Artists.FirstOrDefault()?.ToLower(), track.Artists.FirstOrDefault()?.Name.ToLower());
-                        if (title + firstArtist > 1.5)
-                        {
-                            audio.TrackValueDictionary.TryAdd(track, title + firstArtist);
-                            return true;
-                        }
-                        double secondArtist = 0;
-                        if (track.Artists.Length > 1 && audio.Artists.Length > 1)
-                            secondArtist = Math.Max(CalculateSimilarity(audio.Artists[0]?.ToLower(), track.Artists[1]?.Name.ToLower()), CalculateSimilarity(audio.Artists[1]?.ToLower(), track.Artists[0]?.Name.ToLower()));
-                        else if (audio.Artists.Length > 1)
-                            secondArtist = CalculateSimilarity(audio.Artists[1]?.ToLower(), track.Artists[0]?.Name.ToLower());
-                        else if (track.Artists.Length > 1)
-                            secondArtist = CalculateSimilarity(audio.Artists[0]?.ToLower(), track.Artists[1]?.Name.ToLower());
+                        string audioFirstArtistRemove = audio.CutArtists.FirstOrDefault() ?? "";
+                        string trackFirstArtistRemove = track.Artists.FirstOrDefault()?.CutName ?? "";
 
-                        if (title + secondArtist > 1.5)
+                        double firstArtist = CalculateSimilarity(audioFirstArtistRemove, trackFirstArtistRemove);
+                        if (title + firstArtist > 1.5)
                         {
                             audio.TrackValueDictionary.TryAdd(track, title + firstArtist + 0.8);
                             return true;
                         }
-                        double album = CalculateSimilarity(audio.Album?.ToLower(), track.Album?.Name.ToLower());
-                        if (title + album + firstArtist > 2.2)
+
+                        string audioSecondArtistRemove = string.Empty;
+                        if (audio.CutArtists.Length > 1)
+                            audioSecondArtistRemove = audio.CutArtists[1];
+
+                        string trackSecondArtistRemove = string.Empty;
+                        if (track.Artists.Length > 1)
+                            trackSecondArtistRemove = GetRemovedString(track.Artists[1].CutName);
+
+                        double secondArtist;
+
+                        secondArtist = Math.Max(Math.Max(CalculateSimilarity(audioSecondArtistRemove, trackSecondArtistRemove),
+                            CalculateSimilarity(audioSecondArtistRemove, trackFirstArtistRemove)),
+                            CalculateSimilarity(audioFirstArtistRemove, trackSecondArtistRemove));
+
+
+                        if (title + secondArtist > 1.5)
                         {
-                            audio.TrackValueDictionary.TryAdd(track, album + title + firstArtist);
+                            audio.TrackValueDictionary.TryAdd(track, title + secondArtist + 0.8);
+                            return true;
+                        }
+                        double album = CalculateSimilarity(audio.Album?.ToLower(), track.Album?.Name.ToLower());
+                        if (title + album + double.Max(firstArtist, secondArtist) > 2.2)
+                        {
+                            audio.TrackValueDictionary.TryAdd(track, album + title + double.Max(firstArtist, secondArtist));
                             return true;
                         }
                         return false;
@@ -204,8 +210,19 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
             }
             await Task.Delay(100);
-            container.WaitToFinishAll();
+            container.Task.Wait();
         }
+
+        private string GetRemovedString(string? title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return string.Empty;
+            IEnumerable<int> s = new int[] { title.LastIndexOf("-"), title.LastIndexOf("feat."), title.LastIndexOf("featuring"), title.LastIndexOf("(") }.Where(x => x > 5);
+            if (s.Any())
+                return title.Remove(s.Min()).ToLower();
+            else return title.ToLower();
+        }
+
         private async Task<Track[]> DownloadPlaylist(string id)
         {
             List<Track> tracks = new();

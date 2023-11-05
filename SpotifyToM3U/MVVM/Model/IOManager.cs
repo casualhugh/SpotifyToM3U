@@ -1,6 +1,7 @@
 ﻿using Microsoft.Extensions.DependencyInjection;
 using SpotifyToM3U.MVVM.ViewModel;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Security;
@@ -40,6 +41,16 @@ namespace SpotifyToM3U.MVVM.Model
             foreach (char c in Path.GetInvalidFileNameChars())
                 fileBuilder.Replace(c.ToString(), string.Empty);
             return fileBuilder.ToString();
+        }
+
+        internal static string CutString(string? title)
+        {
+            if (string.IsNullOrWhiteSpace(title))
+                return string.Empty;
+            IEnumerable<int> s = new int[] { title.LastIndexOf("-"), title.LastIndexOf("feat."), title.LastIndexOf("featuring"), title.LastIndexOf("(") }.Where(x => x > 5);
+            if (s.Any())
+                return title.Remove(s.Min()).ToLower();
+            else return title.ToLower();
         }
         /// <summary>
         /// Removes all invalid Characters for a filename out of a string
@@ -114,7 +125,7 @@ namespace SpotifyToM3U.MVVM.Model
             using TextReader dirReader = new StreamReader(SettingsSaveFilePath);
             string[] list = (serializer.Deserialize(dirReader) as string[]) ?? Array.Empty<string>();
             Array.ForEach(list, (x) => _libraryVM.RootPathes.Add(x));
-            _exportVM.LibraryVM_AudioFilesModifified(this, null);
+            _exportVM.LibraryVM_AudioFilesModifified(this, null!);
 
         }
 

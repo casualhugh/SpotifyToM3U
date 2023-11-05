@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DownloaderLibrary;
-using DownloaderLibrary.Base.Request;
 using Microsoft.Extensions.DependencyInjection;
+using Requests;
 using SpotifyToM3U.Core;
 using SpotifyToM3U.MVVM.Model;
 using System;
@@ -43,7 +42,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
         public RequestHandler RequestHandler { get; } = new()
         {
-            StaticDegreeOfParallelism = Environment.ProcessorCount * 3
+            StaticDegreeOfParallelism = Environment.ProcessorCount
         };
 
         public event EventHandler? AudioFilesModifified;
@@ -70,7 +69,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 bool d2 = vm.ScanSubdirectories;
                 RootPathes.Add(d1);
                 ShowProgressBar = true;
-                Task t = Task.Run(() => LoadFolderFiles(exts, d1, d2));
+                Task t = Task.Run(async () => await LoadFolderFiles(exts, d1, d2));
                 t.ContinueWith(at =>
                 {
                     IsNext = AudioFiles.Count > 0;
@@ -84,7 +83,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
         }
 
-        private void LoadFolderFiles(string[] exts, string root, bool recursive)
+        private async Task LoadFolderFiles(string[] exts, string root, bool recursive)
         {
             Stopwatch w = Stopwatch.StartNew();
 
@@ -96,8 +95,12 @@ namespace SpotifyToM3U.MVVM.ViewModel
             {
                 Handler = RequestHandler
             }));
-            Task.Delay(100).Wait();
-            container.WaitToFinishAll();
+            await Task.Delay(100);
+            do
+            {
+                await container.Task;
+                await Task.Delay(200);
+            } while (container.State == Requests.Options.RequestState.Running);
             w.Stop();
             Debug.WriteLine(w.Elapsed.TotalSeconds);
         }
@@ -166,14 +169,19 @@ namespace SpotifyToM3U.MVVM.ViewModel
                         container.Add(new OwnRequest((t) => { if (!AudioFiles.ContainsFile(path)) AudioFiles.Add(new AudioFile(path)); Interlocked.Increment(ref _processedFiles); return Task.FromResult(true); }, new()
                         {
                             Handler = RequestHandler,
-                            RequestCompleated = (s) =>
+                            RequestCompleated = (s, e) =>
                             {
                                 RootPathes.Add(path);
                                 OnPropertyChanged(nameof(ProgressValue));
                             }
                         }));
-                    await Task.Delay(100);
-                    container.WaitToFinishAll();
+                    await Task.Delay(400);
+                    do
+                    {
+                        await container.Task;
+                        await Task.Delay(400);
+                    } while (container.State == Requests.Options.RequestState.Running);
+
                     IsNext = AudioFiles.Count > 0;
                     AudioFilesModifified?.Invoke(this, null!);
                 });

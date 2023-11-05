@@ -1,11 +1,11 @@
-﻿namespace SpotifyToM3U.MVVM.Model
-{
-    using CommunityToolkit.Mvvm.ComponentModel;
-    using System;
-    using System.Linq;
-    using System.Text.Json;
-    using System.Text.Json.Serialization;
+﻿using CommunityToolkit.Mvvm.ComponentModel;
+using System;
+using System.Linq;
+using System.Text.Json;
+using System.Text.Json.Serialization;
 
+namespace SpotifyToM3U.MVVM.Model
+{
     public partial class SpotifyPlaylist : ObservableObject
     {
         [JsonPropertyName("description")]
@@ -62,7 +62,9 @@
 
         [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
+        public string Name { get => _name; set { CutName = IOManager.CutString(value); _name = value; } }
+        public string _name = string.Empty;
+        public string CutName { get; set; } = string.Empty;
     }
 
 
@@ -117,7 +119,9 @@
         private string _path = string.Empty;
 
         [JsonPropertyName("name")]
-        public string Name { get; set; } = string.Empty;
+        public string Title { get => _title; set { CutTitle = IOManager.CutString(value); _title = value; } }
+        public string _title = string.Empty;
+        public string CutTitle { get; set; } = string.Empty;
 
         [JsonPropertyName("uri")]
         public string Uri { get; set; } = string.Empty;
