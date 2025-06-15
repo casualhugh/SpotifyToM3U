@@ -1,52 +1,66 @@
-﻿# Spotify Playlist to M3U8 Converter
+﻿# 🎵 Spotify Playlist to M3U8 Converter  
 
-Welcome to the Spotify Playlist Converter application! This WPF application is designed to help you convert your Spotify playlists into M3U8 playlist files that can be played on your local PC.
+**Seamlessly bridge Spotify and your local music library!**  
+This tool converts Spotify playlists (public or private) into **M3U8** playlist files, letting you enjoy your curated music offline in any player that supports M3U playlists (like VLC, Foobar2000, or Winamp).  
 
-To get started, you don't need to have a Spotify account. Search for public playlists you like and once you have your playlists ready, you can use the Spotify Playlist Converter to convert them into M3U8 files that can be played on your local PC.
+### 🔍 Why Use This Tool?  
+- **Own your playlists**: Save Spotify playlists as local files, even if tracks get removed from Spotify.  
+- **Works offline**: M3U8 files reference your existing local music files—no streaming required.  
+- **Perfect for**:  
+  - 🎧 Audiophiles with high-quality local copies of songs.  
+  - 🚴 Offline listeners (travel, gym, etc.).  
+  - 🗄️ Archivists preserving playlist orders.  
 
-The application uses the Spotify API to access your playlists and retrieve the track information. It then searches your local PC for the corresponding music files and creates an M3U8 playlist file that can be played in your favorite media player.
+---
 
-Select the playlist you want to convert and click the "Convert" button. The application will then search your local PC for the corresponding music files and create an M3U8 playlist file. You can also choose the format of the audio files that should be searched.
-The Spotify to M3U Converter application is designed to be easy to use and intuitive.
+## 🌟 Key Features  
 
-## Features
+| Feature | Description |  
+|---------|-------------|  
+| **Spotify Login** | Access private playlists by logging into your Spotify account. |  
+| **Public Playlists** | Convert without an account—just paste the playlist URL. |  
+| **File Format Support** | Searches for MP3, FLAC, WAV, and more in your local library. |  
+| **Metadata Matching** | Intelligently matches Spotify tracks to local files using artist/title/album data. |  
 
-- Convert public Spotify playlists to M3U8 playlists file
-- No need to have a Spotify account
-- Easy to use interface
-- Compatible with Windows
+<img align="center" src="https://github.com/user-attachments/assets/999c08ea-78ed-4be9-bf4f-dd60bfe4641e" alt="App Preview" width="600"/>
 
-## Installation
+---
 
-To use this application, simply download the latest release from the repository and run the installer. Follow the on-screen instructions to complete the installation process. This application is based on .Net 7 so you will have to install it.
+## 📥 Installation  
 
-## Usage
+1. **Ensure [.NET 8 Runtime](https://dotnet.microsoft.com/download/dotnet/8.0) is installed**.  
+2. Download the latest release from the [Releases page](#).  
+3. Run the installer and follow the prompts.  
 
-Once the application is installed, open it and follow these steps:
+---
 
-1. Click on the "Add" button to select the folder where your local music files are stored.
-2. Enter the URL of the public Spotify playlist you want to convert.
-3. Click on the "Convert" button to start the conversion process.
-4. Then the converted M3U8 playlist file can be exported.
+## 🚀 Usage  
 
-## Pictures
+1. **Launch the app** and log in (optional for private playlists).  
+2. **Add your music folder** (where local files are stored).  
+3. **Paste a Spotify playlist URL** (public or private).  
+4. Click **"Convert"** to generate the M3U8 file.  
+5. **Export and play** in VLC, Foobar2000, or any M3U8-compatible player.  
 
-![first](https://i.imgur.com/rqYzI1C.png)
+<img align="center" src="https://github.com/user-attachments/assets/cfed990d-bc6d-4b25-a68c-8b9536281d2c" alt="Conversion Preview" width="600"/>
 
-![second](https://i.imgur.com/vXnAF7K.png)
+---
 
-## Support
+## 🔧 Troubleshooting  
 
-If you encounter any issues while using this application, please create an issue on the repository page. We will do our best to address your concerns as soon as possible.
+- **Missing tracks?** Ensure filenames match Spotify’s metadata (e.g., `Artist - Title.mp3`).  
+- **Login issues?** Re-authenticate via Spotify’s OAuth prompt.  
+- **File not found?** Check your selected music folder path.  
 
-## Contributing
+Report bugs on the [Issues page](#).  
 
-If you would like to contribute to this project, please fork the repository and submit a pull request with your changes. We welcome any contributions that can improve the functionality or user experience of the application.
+---
 
-## License
+## 📜 License  
 
-This application is licensed under the MIT license. You are free to use, modify, and distribute the application as long as you include the license file with any copies or modifications.
+MIT © 2025 [TypNull](https://github.com/TypNull).  
+See [LICENSE.txt](LICENSE.txt) for details.  
 
-## Conclusion
+---
 
-We hope that this application will be useful for anyone who wants to convert public Spotify playlists to M3U8 playlists file. If you have any feedback or suggestions for improvement, please let us know. Thank you for using our application!
+Made with ♥ for music lovers. 🎶  
