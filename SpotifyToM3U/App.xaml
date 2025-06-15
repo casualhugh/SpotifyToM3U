@@ -2,7 +2,7 @@
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SpotifyToM3U"
-               xmlns:view="clr-namespace:SpotifyToM3U.MVVM.View"
+             xmlns:view="clr-namespace:SpotifyToM3U.MVVM.View"
              xmlns:vm="clr-namespace:SpotifyToM3U.MVVM.ViewModel">
     <Application.Resources>
         <ResourceDictionary>
@@ -14,15 +14,16 @@
                 <ResourceDictionary Source="/Styles/ModernContextMenuStyle.xaml" />
                 <ResourceDictionary Source="/Styles/CheckBoxStyle.xaml" />
                 <ResourceDictionary Source="/Styles/ModernTextBoxStyle.xaml" />
+                <ResourceDictionary Source="/Styles/ModernDataGridStyle.xaml" />
             </ResourceDictionary.MergedDictionaries>
             <DataTemplate DataType="{x:Type  vm:LibraryVM}">
-                <view:LibraryView/>
+                <view:LibraryView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type  vm:SpotifyVM}">
-                <view:SpotifyView/>
+                <view:SpotifyView />
             </DataTemplate>
             <DataTemplate DataType="{x:Type  vm:ExportVM}">
-                <view:ExportView/>
+                <view:ExportView />
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

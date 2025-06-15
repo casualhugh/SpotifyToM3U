@@ -1,6 +1,6 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DownloaderLibrary.Web;
+using DownloadAssistant.Base;
 using Microsoft.Extensions.DependencyInjection;
 using Requests;
 using SpotifyToM3U.Core;
@@ -151,7 +151,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
             foreach (Track track in spotifyTracks)
             {
-                container.Add((OwnRequest)new((t) =>
+                container.Add(new((t) =>
                 {
                     IEnumerable<AudioFile> found = _libraryVM.AudioFiles.Where(audio =>
                     {
