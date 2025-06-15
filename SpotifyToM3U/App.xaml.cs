@@ -31,8 +31,10 @@ namespace SpotifyToM3U
             services.AddSingleton<SpotifyVM>();
             services.AddSingleton<ExportVM>();
             services.AddSingleton<AddFolderVM>();
+            services.AddTransient<SpotifySetupVM>();
 
             services.AddSingleton<INavigationService, NavigationService>();
+            services.AddSingleton<ISpotifyService, SpotifyService>();
             services.AddSingleton<Func<Type, ViewModelObject>>(provider => viewModelType => (ViewModelObject)provider.GetRequiredService(viewModelType));
 
             _serviceProvider = services.BuildServiceProvider();
@@ -47,5 +49,17 @@ namespace SpotifyToM3U
             window.Show();
         }
 
+        protected override void OnExit(ExitEventArgs e)
+        {
+            // Clean up Spotify service
+            ISpotifyService? spotifyService = _serviceProvider.GetService<ISpotifyService>();
+            if (spotifyService != null)
+            {
+                _ = spotifyService.LogoutAsync();
+            }
+
+            _serviceProvider?.Dispose();
+            base.OnExit(e);
+        }
     }
 }

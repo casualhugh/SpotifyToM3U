@@ -26,6 +26,9 @@
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                         <Border.Style>
                             <Style TargetType="Border">
+
+                                <Setter Property="Padding"
+                                        Value="5,0" />
                                 <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=Button}}"/>
                                 <Style.Triggers>
                                     <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">

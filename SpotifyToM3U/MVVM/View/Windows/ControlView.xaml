@@ -114,35 +114,24 @@
             <!-- Minimize Button -->
             <Button x:Name="MinimizeButton"
                     Content="&#xE921;"
-                    Command="{Binding MinimizeCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    Click="MinimizeButton_Click"
                     Style="{StaticResource ModernWindowControlButton}"
                     ToolTip="Minimize" />
 
             <!-- Maximize/Restore Button -->
             <Button x:Name="MaximizeButton"
-                    Command="{Binding MaximizeCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
-                    ToolTip="Maximize">
-                <Button.Style>
-                    <Style TargetType="Button"
-                           BasedOn="{StaticResource ModernWindowControlButton}">
-                        <Setter Property="Content"
-                                Value="&#xE922;" />
-                        <Style.Triggers>
-                            <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource AncestorType={x:Type Window}}}"
-                                         Value="Maximized">
-                                <Setter Property="Content"
-                                        Value="&#xE923;" />
-                                <Setter Property="ToolTip"
-                                        Value="Restore" />
-                            </DataTrigger>
-                        </Style.Triggers>
-                    </Style>
-                </Button.Style>
+                    Click="MaximizeButton_Click"
+                    ToolTip="Maximize"
+                    Style="{StaticResource ModernWindowControlButton}">
+                <Button.Content>
+                    <TextBlock x:Name="MaximizeIcon"
+                               Text="&#xE922;" />
+                </Button.Content>
             </Button>
 
             <!-- Close Button -->
             <Button Content="&#xE8BB;"
-                    Command="{Binding CloseCommand, RelativeSource={RelativeSource AncestorType={x:Type UserControl}}}"
+                    Click="CloseButton_Click"
                     Style="{StaticResource ModernCloseButton}"
                     ToolTip="Close" />
 

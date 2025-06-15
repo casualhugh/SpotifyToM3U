@@ -1,0 +1,433 @@
+﻿<Window x:Class="SpotifyToM3U.MVVM.View.Windows.SpotifySetupWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows"
+        xmlns:vm="clr-namespace:SpotifyToM3U.MVVM.ViewModel"
+        xmlns:conv="clr-namespace:SpotifyToM3U.Core.Converter"
+        d:DataContext="{d:DesignInstance Type=vm:SpotifySetupVM}"
+        mc:Ignorable="d"
+        Title="Spotify API Setup"
+        Height="600"
+        Width="500"
+        ResizeMode="NoResize"
+        AllowsTransparency="True"
+        WindowStyle="None"
+        ShowInTaskbar="False"
+        Background="Transparent"
+        WindowStartupLocation="CenterOwner"
+        Topmost="True">
+
+    <Window.Resources>
+        <!-- Modern Input Field Style -->
+        <Style x:Key="ModernInputField"
+               TargetType="TextBox">
+            <Setter Property="Padding"
+                    Value="12,5" />
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="BorderBrush"
+                    Value="#E0E0E0" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused"
+                                     Value="True">
+                                <Setter Property="BorderBrush"
+                                        Value="#FF7CDC8F" />
+                                <Setter Property="BorderThickness"
+                                        Value="2" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="BorderBrush"
+                                        Value="#FF99CE9C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernDialogButton"
+               TargetType="Button">
+            <Setter Property="Padding"
+                    Value="16,8" />
+            <Setter Property="Height"
+                    Value="36" />
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+            <Setter Property="BorderThickness"
+                    Value="0" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}"
+                                CornerRadius="6"
+                                Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="Opacity"
+                                        Value="0.9" />
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter Property="Opacity"
+                                        Value="0.8" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Step Style -->
+        <Style x:Key="StepNumber"
+               TargetType="Border">
+            <Setter Property="Width"
+                    Value="24" />
+            <Setter Property="Height"
+                    Value="24" />
+            <Setter Property="CornerRadius"
+                    Value="12" />
+            <Setter Property="Background"
+                    Value="#FF7CDC8F" />
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+            <Setter Property="VerticalAlignment"
+                    Value="Top" />
+            <Setter Property="Margin"
+                    Value="0,0,12,0" />
+        </Style>
+
+        <!-- Selectable TextBox Style for URLs -->
+        <Style x:Key="SelectableTextBox"
+               TargetType="TextBox">
+            <Setter Property="IsReadOnly"
+                    Value="True" />
+            <Setter Property="Background"
+                    Value="#F5F5F5" />
+            <Setter Property="BorderBrush"
+                    Value="#E0E0E0" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Padding"
+                    Value="8" />
+            <Setter Property="FontFamily"
+                    Value="Consolas" />
+            <Setter Property="FontSize"
+                    Value="12" />
+            <Setter Property="Foreground"
+                    Value="#2E2E2E" />
+            <Setter Property="Cursor"
+                    Value="IBeam" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="4"
+                                Padding="{TemplateBinding Padding}">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Focusable="False"
+                                          HorizontalScrollBarVisibility="Hidden"
+                                          VerticalScrollBarVisibility="Hidden" />
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </Window.Resources>
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="#FF7CDC8F"
+                    CornerRadius="16,16,0,0"
+                    Padding="24,8">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <StackPanel Grid.Column="0"
+                                Orientation="Horizontal">
+                        <TextBlock Text="🎵"
+                                   FontSize="20"
+                                   Margin="0,0,8,0"
+                                   VerticalAlignment="Center" />
+                        <TextBlock Text="Spotify API Setup"
+                                   FontSize="18"
+                                   FontWeight="Bold"
+                                   Foreground="White"
+                                   VerticalAlignment="Center" />
+                    </StackPanel>
+
+                    <!-- Close Button -->
+                    <Button Grid.Column="1"
+                            Content="✕"
+                            Command="{Binding CancelCommand}"
+                            Width="28"
+                            Height="28"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="White"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Opacity="0.8">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="14">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True">
+                                        <Setter Property="Background"
+                                                Value="#E74C3C" />
+                                        <Setter Property="Opacity"
+                                                Value="1" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <ScrollViewer Grid.Row="1"
+                          Padding="24,20"
+                          VerticalScrollBarVisibility="Auto">
+                <StackPanel>
+                    <!-- Introduction -->
+                    <TextBlock Text="To use Spotify integration, you need to create a Spotify application and configure API credentials."
+                               FontSize="14"
+                               Foreground="#666666"
+                               TextWrapping="Wrap"
+                               Margin="0,0,0,24" />
+
+                    <!-- Step 1 -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Style="{StaticResource StepNumber}">
+                            <TextBlock Text="1"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Create Spotify Application"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8" />
+                            <TextBlock Text="1. Go to https://developer.spotify.com/dashboard"
+                                       FontSize="12"
+                                       Foreground="#666666"
+                                       Margin="0,0,0,4" />
+                            <TextBlock Text="2. Log in with your Spotify account"
+                                       FontSize="12"
+                                       Foreground="#666666"
+                                       Margin="0,0,0,4" />
+                            <TextBlock Text="3. Click 'Create an App'"
+                                       FontSize="12"
+                                       Foreground="#666666"
+                                       Margin="0,0,0,4" />
+                            <TextBlock Text="4. Fill in app name and description"
+                                       FontSize="12"
+                                       Foreground="#666666"
+                                       Margin="0,0,0,8" />
+                            <Button Content="🌐 Open Spotify Developer Dashboard"
+                                    Command="{Binding OpenDashboardCommand}"
+                                    Background="#FF7CDC8F"
+                                    Foreground="White"
+                                    Style="{StaticResource ModernDialogButton}"
+                                    HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Step 2 -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Style="{StaticResource StepNumber}">
+                            <TextBlock Text="2"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Configure Redirect URI"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8" />
+                            <TextBlock Text="In your app settings, add this redirect URI:"
+                                       FontSize="12"
+                                       Foreground="#666666"
+                                       Margin="0,0,0,4" />
+
+                            <!-- Selectable TextBox for the URL -->
+                            <TextBox Text="http://localhost:5000/callback"
+                                     Style="{StaticResource SelectableTextBox}"
+                                     Margin="0,4,0,8"
+                                     ToolTip="Click to select all text, then copy with Ctrl+C" />
+
+                            <Button Content="📋 Copy Redirect URI"
+                                    Command="{Binding CopyRedirectUriCommand}"
+                                    Background="#74C7EC"
+                                    Foreground="White"
+                                    Style="{StaticResource ModernDialogButton}"
+                                    HorizontalAlignment="Left" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Step 3 -->
+                    <Grid Margin="0,0,0,20">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
+
+                        <Border Grid.Column="0"
+                                Style="{StaticResource StepNumber}">
+                            <TextBlock Text="3"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="White"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center" />
+                        </Border>
+
+                        <StackPanel Grid.Column="1">
+                            <TextBlock Text="Enter Your Credentials"
+                                       FontSize="14"
+                                       FontWeight="SemiBold"
+                                       Margin="0,0,0,8" />
+
+                            <TextBlock Text="Client ID"
+                                       FontSize="12"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,4" />
+                            <TextBox Text="{Binding ClientId, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource ModernInputField}"
+                                     Margin="0,0,0,12" />
+
+                            <TextBlock Text="Client Secret"
+                                       FontSize="12"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,4" />
+                            <TextBox Text="{Binding ClientSecret, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource ModernInputField}"
+                                     Margin="0,0,0,8" />
+
+                            <TextBlock Text="⚠️ Keep your Client Secret private and secure!"
+                                       FontSize="10"
+                                       Foreground="#FF9800"
+                                       FontStyle="Normal" />
+                        </StackPanel>
+                    </Grid>
+
+                    <!-- Status Message -->
+                    <Border Background="{Binding HasValidationErrors, Converter={x:Static conv:ErrorColorConverter.Instance}}"
+                            CornerRadius="6"
+                            Padding="12,8"
+                            Margin="0,16,0,0"
+                            Visibility="{Binding StatusMessage, Converter={x:Static conv:StringToVisibilityConverter.Instance}}">
+                        <TextBlock Text="{Binding StatusMessage}"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   TextWrapping="Wrap" />
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Footer -->
+            <Border Grid.Row="2"
+                    Background="#F8F9FA"
+                    CornerRadius="0,0,16,16"
+                    Padding="24,16">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="❌ Cancel"
+                            Command="{Binding CancelCommand}"
+                            Background="#FF6B6B"
+                            Foreground="White"
+                            Style="{StaticResource ModernDialogButton}"
+                            Margin="0,0,12,0"
+                            MinWidth="80" />
+
+                    <Button Content="✅ Save Configuration"
+                            Command="{Binding SaveConfigurationCommand}"
+                            IsEnabled="{Binding IsSaving, Converter={x:Static conv:InverseBooleanConverter.Instance}}"
+                            Background="#FF7CDC8F"
+                            Foreground="White"
+                            Style="{StaticResource ModernDialogButton}"
+                            IsDefault="True"
+                            MinWidth="140" />
+                </StackPanel>
+            </Border>
+        </Grid>
+    </Border>
+</Window>

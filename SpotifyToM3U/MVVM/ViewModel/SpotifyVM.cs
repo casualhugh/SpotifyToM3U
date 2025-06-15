@@ -1,8 +1,7 @@
 ﻿using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
-using DownloadAssistant.Base;
 using Microsoft.Extensions.DependencyInjection;
-using Requests;
+using SpotifyAPI.Web;
 using SpotifyToM3U.Core;
 using SpotifyToM3U.MVVM.Model;
 using System;
@@ -10,8 +9,6 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Diagnostics;
 using System.Linq;
-using System.Net.Http;
-using System.Text.Json;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Windows;
@@ -19,139 +16,352 @@ using System.Windows.Data;
 
 namespace SpotifyToM3U.MVVM.ViewModel
 {
-    internal partial class SpotifyVM : ViewModelObject
+    public partial class PlaylistInfo : ObservableObject
     {
         [ObservableProperty]
+        private string _id = string.Empty;
+
+        [ObservableProperty]
+        private string _name = string.Empty;
+
+        [ObservableProperty]
+        private string _description = string.Empty;
+
+        [ObservableProperty]
+        private string _imageUrl = string.Empty;
+
+        [ObservableProperty]
+        private int _trackCount = 0;
+
+        [ObservableProperty]
+        private string _owner = string.Empty;
+
+        [ObservableProperty]
+        private bool _isSelected = false;
+
+        [ObservableProperty]
+        private bool _isPublic = true;
+
+        public PlaylistInfo() { }
+
+        public PlaylistInfo(FullPlaylist playlist)
+        {
+            Id = playlist.Id!;
+            Name = playlist.Name!;
+            Description = playlist.Description ?? string.Empty;
+            ImageUrl = playlist.Images?.FirstOrDefault()?.Url ?? string.Empty;
+            TrackCount = playlist.Tracks?.Total ?? 0;
+            Owner = playlist.Owner?.DisplayName ?? playlist.Owner?.Id ?? "Unknown";
+            IsPublic = playlist.Public ?? false;
+        }
+    }
+
+    internal partial class SpotifyVM : ViewModelObject
+    {
+        private readonly ISpotifyService _spotifyService;
+        private readonly LibraryVM _libraryVM;
+
+        [ObservableProperty]
         private string _playlistIDText = string.Empty;
-        private string _playlistIDTextOld = string.Empty;
 
         [ObservableProperty]
-        private bool _isLoadButtonEnabeld = true;
+        private bool _isAuthenticated = false;
 
         [ObservableProperty]
-        private bool _isInfoVisible = false;
-        public int PlaylistFound => PlaylistTracks.Where(x => x.IsLocal)?.Count() ?? 0;
+        private string _currentUser = "Not logged in";
 
-        public int PlaylistLength => PlaylistTracks?.Count ?? 0;
-
-        public string PlaylistName => _playlist.Name;
-
+        [ObservableProperty]
+        private bool _isLoading = false;
 
         [ObservableProperty]
         private bool _isNext = false;
 
+        [ObservableProperty]
+        private string _statusMessage = "Connect to Spotify to get started";
 
-        private string _token = string.Empty;
-        private DateTime _time = DateTime.Now.AddMinutes(-21);
+        [ObservableProperty]
+        private ObservableCollection<PlaylistInfo> _userPlaylists = new();
+
+        [ObservableProperty]
+        private PlaylistInfo? _selectedPlaylist;
 
         [ObservableProperty]
         private ObservableCollection<Track> _playlistTracks = new();
-        private SpotifyPlaylist _playlist = new();
-        private LibraryVM _libraryVM;
+
+        [ObservableProperty]
+        private bool _showPlaylists = false;
+
+        [ObservableProperty]
+        private bool _showManualInput = true;
+
+        [ObservableProperty]
+        private int _playlistFound = 0;
+
+        [ObservableProperty]
+        private int _playlistLength = 0;
+
+        [ObservableProperty]
+        private string _playlistName = "Unknown Playlist";
 
         public SpotifyVM(INavigationService navigation) : base(navigation)
         {
+            _spotifyService = App.Current.ServiceProvider.GetRequiredService<ISpotifyService>();
             _libraryVM = App.Current.ServiceProvider.GetRequiredService<LibraryVM>();
-            _libraryVM.AudioFilesModifified += LibraryVM_AudioFilesModifified;
+
+            _spotifyService.AuthenticationStateChanged += OnAuthenticationStateChanged;
+            _libraryVM.AudioFilesModifified += LibraryVM_AudioFilesModified;
+
             BindingOperations.EnableCollectionSynchronization(PlaylistTracks, new object());
+            BindingOperations.EnableCollectionSynchronization(UserPlaylists, new object());
+
+            // Initialize authentication state
+            IsAuthenticated = _spotifyService.IsAuthenticated;
+            CurrentUser = _spotifyService.CurrentUserName;
+
+            if (IsAuthenticated)
+            {
+                StatusMessage = $"Connected as {CurrentUser}";
+                _ = LoadUserPlaylistsAsync();
+            }
+
+            // Initialize playlist stats
+            UpdatePlaylistStats();
+        }
+
+        [RelayCommand]
+        private async Task AuthenticateAsync()
+        {
+            try
+            {
+                IsLoading = true;
+                StatusMessage = "Connecting to Spotify...";
+
+                if (IsAuthenticated)
+                {
+                    await _spotifyService.LogoutAsync();
+                }
+                else
+                {
+                    bool success = await _spotifyService.AuthenticateAsync();
+                    if (!success)
+                    {
+                        StatusMessage = "Failed to connect to Spotify. Please check your configuration.";
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Authentication error: {ex.Message}";
+                MessageBox.Show($"Authentication failed: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task LoadUserPlaylistsAsync()
+        {
+            if (!IsAuthenticated)
+                return;
+
+            try
+            {
+                IsLoading = true;
+                StatusMessage = "Loading your playlists...";
+
+                UserPlaylists.Clear();
+                IEnumerable<FullPlaylist> playlists = await _spotifyService.GetUserPlaylistsAsync();
+
+                foreach (FullPlaylist playlist in playlists)
+                {
+                    UserPlaylists.Add(new PlaylistInfo(playlist));
+                }
+
+                ShowPlaylists = UserPlaylists.Count > 0;
+                StatusMessage = $"Loaded {UserPlaylists.Count} playlists";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error loading playlists: {ex.Message}";
+                Debug.WriteLine($"Error loading playlists: {ex}");
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task LoadPlaylistAsync(PlaylistInfo? playlist = null)
+        {
+            try
+            {
+                playlist ??= SelectedPlaylist;
+                if (playlist == null)
+                    return;
+
+                IsLoading = true;
+                IsNext = false;
+                StatusMessage = $"Loading playlist: {playlist.Name}";
+
+                PlaylistTracks.Clear();
+                SelectedPlaylist = playlist;
+
+                List<Track> tracks = await LoadAllPlaylistTracksAsync(playlist.Id);
+
+                foreach (Track track in tracks)
+                {
+                    PlaylistTracks.Add(track);
+                }
+
+                // Update stats after loading tracks
+                UpdatePlaylistStats();
+
+                // Find local matches
+                await FindTracksLocalAsync(tracks);
+
+                // Update stats after finding local matches
+                UpdatePlaylistStats();
+
+                if (PlaylistTracks.Any(x => x.IsLocal))
+                {
+                    IsNext = true;
+                    StatusMessage = $"Loaded {PlaylistLength} tracks, found {PlaylistFound} locally";
+                }
+                else
+                {
+                    StatusMessage = $"Loaded {PlaylistLength} tracks, no local matches found";
+                }
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error loading playlist: {ex.Message}";
+                MessageBox.Show($"Error loading playlist: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private async Task LoadPlaylistByIdAsync()
+        {
+            if (string.IsNullOrWhiteSpace(PlaylistIDText))
+                return;
+
+            try
+            {
+                IsLoading = true;
+                StatusMessage = "Loading playlist...";
+
+                string playlistId = ExtractPlaylistId(PlaylistIDText);
+                if (string.IsNullOrEmpty(playlistId))
+                {
+                    StatusMessage = "Invalid playlist URL or ID";
+                    return;
+                }
+
+                FullPlaylist playlist = await _spotifyService.GetPlaylistAsync(playlistId);
+                PlaylistInfo playlistInfo = new(playlist);
+
+                await LoadPlaylistAsync(playlistInfo);
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Error loading playlist: {ex.Message}";
+                MessageBox.Show($"Error loading playlist: {ex.Message}", "Error",
+                              MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+            finally
+            {
+                IsLoading = false;
+            }
+        }
+
+        [RelayCommand]
+        private void ToggleInputMode()
+        {
+            ShowManualInput = !ShowManualInput;
         }
 
         [RelayCommand]
         private void Next() => Navigation.NavigateTo<ExportVM>();
 
-        [RelayCommand]
-        private void Load()
+        private void UpdatePlaylistStats()
         {
-            if (IsLoadButtonEnabeld == false || _playlistIDTextOld == PlaylistIDText)
-                return;
-            IsLoadButtonEnabeld = false;
-            IsNext = false;
-            _libraryVM.IsNext = false;
-            IsInfoVisible = false;
-
-            _playlistIDTextOld = PlaylistIDText;
-            if (PlaylistIDText.Length <= 21)
-            {
-                _libraryVM.IsNext = true;
-                IsLoadButtonEnabeld = true;
-                return;
-            }
-            LoadPlaylist();
+            PlaylistLength = PlaylistTracks.Count;
+            PlaylistFound = PlaylistTracks.Count(x => x.IsLocal);
+            PlaylistName = SelectedPlaylist?.Name ?? "Unknown Playlist";
         }
 
-        public bool TryGetID(out string id)
+        private async Task<List<Track>> LoadAllPlaylistTracksAsync(string playlistId)
         {
-            id = PlaylistIDText.Trim();
-            if (new Regex("(?<=.open\\.spotify\\.com/playlist/)(.*)(?=/?)", RegexOptions.IgnoreCase).Match(id) is Match match && match.Success)
-            {
-                Debug.WriteLine(match.Groups[0].Value);
-                id = match.Groups[1].Value;
+            List<Track> tracks = new();
 
-            }
-            if (id.Length < 21) return false;
-            return true;
-        }
+            List<PlaylistTrack<IPlayableItem>> playlistTracks = await _spotifyService.GetAllPlaylistTracksAsync(playlistId);
 
-        private void LoadPlaylist()
-        {
-            try
+            foreach (PlaylistTrack<IPlayableItem> item in playlistTracks)
             {
-                string id = string.Empty;
-                if (!TryGetID(out id))
+                if (item.Track is FullTrack fullTrack)
                 {
-                    MessageBox.Show("Playlist id does not have the right format", "Info", MessageBoxButton.OK, MessageBoxImage.Asterisk);
-                    _libraryVM.IsNext = true;
-                    IsLoadButtonEnabeld = true;
-                    return;
+                    Track track = ConvertToTrack(fullTrack);
+                    tracks.Add(track);
                 }
-                PlaylistTracks.Clear();
-                Search(id);
             }
-            catch (Exception)
-            {
-                _libraryVM.IsNext = true;
-                IsLoadButtonEnabeld = true;
-            }
+
+            return tracks;
         }
 
-        private void Search(string id)
+        private Track ConvertToTrack(FullTrack spotifyTrack)
         {
-            Task.Run(async () =>
+            Track track = new()
             {
-                await Task.Yield();
-                try
-                {
-                    if (_token == string.Empty || DateTime.Now.AddMinutes(-20) > _time)
-                        await CreateToken();
-                    Track[] tracks = await DownloadPlaylist(id);
+                Id = spotifyTrack.Id,
+                Title = spotifyTrack.Name,
+                CutTitle = IOManager.CutString(spotifyTrack.Name),
+                Uri = spotifyTrack.Uri,
+                IsLocal = false,
+                Path = string.Empty
+            };
 
-                    PlaylistTracks = new(tracks);
-                    OnPropertyChanged(nameof(PlaylistLength));
-                    OnPropertyChanged(nameof(PlaylistName));
-                    IsInfoVisible = true;
-                    await FindTracksLocal(tracks);
-                    _libraryVM.IsNext = true;
-                    if (tracks.Any(x => x.IsLocal))
-                        IsNext = true;
-                    IsLoadButtonEnabeld = true;
-                    OnPropertyChanged(nameof(PlaylistFound));
-                }
-                catch (Exception)
+            // Set album
+            track.Album = new Album
+            {
+                Id = spotifyTrack.Album.Id,
+                Name = spotifyTrack.Album.Name,
+                Uri = spotifyTrack.Album.Uri,
+                Images = spotifyTrack.Album.Images?.Select(img => new Model.Image
                 {
-                    MessageBox.Show("Can not fetch token. Please try again later", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
-                    _libraryVM.IsNext = true;
-                    IsLoadButtonEnabeld = true;
-                }
-            });
+                    Url = new Uri(img.Url),
+                    Height = img.Height,
+                    Width = img.Width
+                }).ToArray() ?? Array.Empty<Model.Image>(),
+                TotalTracks = spotifyTrack.Album.TotalTracks
+            };
+
+            // Set artists
+            track.Artists = spotifyTrack.Artists?.Select(artist => new Owner
+            {
+                Id = artist.Id,
+                Name = artist.Name,
+                CutName = IOManager.CutString(artist.Name),
+                Uri = artist.Uri,
+                DisplayName = artist.Name
+            }).ToArray() ?? Array.Empty<Owner>();
+
+            return track;
         }
 
-        private async Task FindTracksLocal(Track[] spotifyTracks)
+        private async Task FindTracksLocalAsync(List<Track> spotifyTracks)
         {
-            RequestContainer<OwnRequest> container = new();
-
-            foreach (Track track in spotifyTracks)
+            await Task.Run(() =>
             {
-                container.Add(new((t) =>
+                foreach (Track track in spotifyTracks)
                 {
                     IEnumerable<AudioFile> found = _libraryVM.AudioFiles.Where(audio =>
                     {
@@ -159,132 +369,83 @@ namespace SpotifyToM3U.MVVM.ViewModel
                         if (title < 0.5)
                             return false;
 
-                        string audioFirstArtistRemove = audio.CutArtists.FirstOrDefault() ?? "";
-                        string trackFirstArtistRemove = track.Artists.FirstOrDefault()?.CutName ?? "";
+                        string audioFirstArtist = audio.CutArtists.FirstOrDefault() ?? "";
+                        string trackFirstArtist = track.Artists.FirstOrDefault()?.CutName ?? "";
 
-                        double firstArtist = CalculateSimilarity(audioFirstArtistRemove, trackFirstArtistRemove);
+                        double firstArtist = CalculateSimilarity(audioFirstArtist, trackFirstArtist);
                         if (title + firstArtist > 1.5)
                         {
                             audio.TrackValueDictionary.TryAdd(track, title + firstArtist + 0.8);
                             return true;
                         }
 
-                        string audioSecondArtistRemove = string.Empty;
-                        if (audio.CutArtists.Length > 1)
-                            audioSecondArtistRemove = audio.CutArtists[1];
+                        string audioSecondArtist = audio.CutArtists.Length > 1 ? audio.CutArtists[1] : "";
+                        string trackSecondArtist = track.Artists.Length > 1 ? track.Artists[1].CutName : "";
 
-                        string trackSecondArtistRemove = string.Empty;
-                        if (track.Artists.Length > 1)
-                            trackSecondArtistRemove = GetRemovedString(track.Artists[1].CutName);
-
-                        double secondArtist;
-
-                        secondArtist = Math.Max(Math.Max(CalculateSimilarity(audioSecondArtistRemove, trackSecondArtistRemove),
-                            CalculateSimilarity(audioSecondArtistRemove, trackFirstArtistRemove)),
-                            CalculateSimilarity(audioFirstArtistRemove, trackSecondArtistRemove));
-
+                        double secondArtist = Math.Max(
+                            Math.Max(CalculateSimilarity(audioSecondArtist, trackSecondArtist),
+                                    CalculateSimilarity(audioSecondArtist, trackFirstArtist)),
+                            CalculateSimilarity(audioFirstArtist, trackSecondArtist));
 
                         if (title + secondArtist > 1.5)
                         {
                             audio.TrackValueDictionary.TryAdd(track, title + secondArtist + 0.8);
                             return true;
                         }
-                        double album = CalculateSimilarity(audio.Album?.ToLower(), track.Album?.Name.ToLower());
-                        if (title + album + double.Max(firstArtist, secondArtist) > 2.2)
+
+                        double album = CalculateSimilarity(audio.Album?.ToLower(), track.Album?.Name?.ToLower());
+                        if (title + album + Math.Max(firstArtist, secondArtist) > 2.2)
                         {
-                            audio.TrackValueDictionary.TryAdd(track, album + title + double.Max(firstArtist, secondArtist));
+                            audio.TrackValueDictionary.TryAdd(track, album + title + Math.Max(firstArtist, secondArtist));
                             return true;
                         }
+
                         return false;
                     });
+
                     if (found.Any())
                     {
+                        AudioFile bestMatch = found.OrderBy(x =>
+                            x.TrackValueDictionary.TryGetValue(track, out double value) ? -value : 0).First();
+
                         track.IsLocal = true;
-                        track.Path = found.OrderBy(x => x.TrackValueDictionary.TryGetValue(track, out double value) ? value : 0).Last().Location;
+                        track.Path = bestMatch.Location;
                     }
-                    return Task.FromResult(true);
-                }, new()
-                {
-                    Handler = _libraryVM.RequestHandler
-                }));
-
-            }
-            await Task.Delay(100);
-            container.Task.Wait();
-        }
-
-        private string GetRemovedString(string? title)
-        {
-            if (string.IsNullOrWhiteSpace(title))
-                return string.Empty;
-            IEnumerable<int> s = new int[] { title.LastIndexOf("-"), title.LastIndexOf("feat."), title.LastIndexOf("featuring"), title.LastIndexOf("(") }.Where(x => x > 5);
-            if (s.Any())
-                return title.Remove(s.Min()).ToLower();
-            else return title.ToLower();
-        }
-
-        private async Task<Track[]> DownloadPlaylist(string id)
-        {
-            List<Track> tracks = new();
-
-            try
-            {
-                int limit = 0;
-                int offset = 0;
-                SpotifyPlaylist spotifyPlaylist = new();
-                do
-                {
-                    limit = limit + 100;
-                    HttpRequestMessage req = new(HttpMethod.Get, "https://api.spotify.com/v1/playlists/" + id + (offset > 0 ? $"/tracks?offset={offset}" : ""));
-                    req.Headers.Authorization = new System.Net.Http.Headers.AuthenticationHeaderValue("Bearer", _token);
-                    HttpGet getter = new(req);
-                    string resp = await (await getter.LoadResponseAsync()).Content.ReadAsStringAsync();
-
-                    if (offset == 0)
-                    {
-                        spotifyPlaylist = SpotifyPlaylist.FromJson(resp)!;
-                        foreach (Item item in spotifyPlaylist.Tracks.Items)
-                            tracks.Add(item.Track);
-                    }
-                    else
-                    {
-                        foreach (Item item in Tracks.FromJson(resp)!.Items)
-                            tracks.Add(item.Track);
-                    }
-
-                    offset = limit;
-
                 }
-                while (spotifyPlaylist.Tracks.Total > limit);
-                _playlist = spotifyPlaylist;
-            }
-
-            catch (Exception)
-            {
-                MessageBox.Show("Playlist not found", "Not found", MessageBoxButton.OK, MessageBoxImage.Information);
-            }
-            return tracks.ToArray();
-        }
-        private async Task CreateToken()
-        {
-            HttpGet getter = new(new(HttpMethod.Get, "https://open.spotify.com/get_access_token?reason=transport&productType=web_player"));
-            _token = await (await getter.LoadResponseAsync()).Content.ReadAsStringAsync();
-            JsonElement dynamicObject = JsonSerializer.Deserialize<JsonElement>(_token)!;
-            _token = dynamicObject.GetProperty("accessToken").ToString();
-            _time = DateTime.Now;
+            });
         }
 
-        public static double CalculateSimilarity(string? source, string? target)
+        private string ExtractPlaylistId(string input)
         {
-            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target)) return 0.0;
-            if (source == target) return 1.0;
+            input = input.Trim();
+
+            // Try to extract from Spotify URL
+            Match match = new Regex(@"(?:open\.spotify\.com/playlist/|playlist:)([a-zA-Z0-9]+)", RegexOptions.IgnoreCase)
+                .Match(input);
+
+            if (match.Success)
+                return match.Groups[1].Value;
+
+            // If it's already just an ID
+            if (input.Length >= 20 && input.All(c => char.IsLetterOrDigit(c)))
+                return input;
+
+            return string.Empty;
+        }
+
+        private static double CalculateSimilarity(string? source, string? target)
+        {
+            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
+                return 0.0;
+            if (source == target)
+                return 1.0;
 
             int stepsToSame = LevenshteinDistance(source, target);
-            return (1.0 - (stepsToSame / (double)Math.Max(source.Length, target.Length)));
+            return 1.0 - (stepsToSame / (double)Math.Max(source.Length, target.Length));
         }
-        public static int LevenshteinDistance(string source, string target)
+
+        private static int LevenshteinDistance(string source, string target)
         {
-            // degenerate cases
             if (source == target) return 0;
             if (source.Length == 0) return target.Length;
             if (target.Length == 0) return source.Length;
@@ -304,29 +465,71 @@ namespace SpotifyToM3U.MVVM.ViewModel
                     int cost = (source[i] == target[j]) ? 0 : 1;
                     v1[j + 1] = Math.Min(v1[j] + 1, Math.Min(v0[j + 1] + 1, v0[j] + cost));
                 }
+
                 for (int j = 0; j < v0.Length; j++)
                     v0[j] = v1[j];
             }
 
             return v1[target.Length];
         }
-        private void LibraryVM_AudioFilesModifified(object? sender, EventArgs e)
+
+        private void OnAuthenticationStateChanged(object? sender, bool isAuthenticated)
         {
-            Track[] tracks = PlaylistTracks.ToArray();
-            Task.Run(async () =>
-           {
-               if (tracks.Any())
-               {
-                   IsLoadButtonEnabeld = false;
-                   IsNext = false;
-                   await FindTracksLocal(tracks);
-                   if (tracks.Any(x => x.IsLocal))
-                       IsNext = true;
-                   IsLoadButtonEnabeld = true;
-                   OnPropertyChanged(nameof(PlaylistFound));
-               }
-           });
+            Application.Current.Dispatcher.Invoke(() =>
+            {
+                IsAuthenticated = isAuthenticated;
+                CurrentUser = _spotifyService.CurrentUserName;
+
+                if (isAuthenticated)
+                {
+                    StatusMessage = $"Connected as {CurrentUser}";
+                    _ = LoadUserPlaylistsAsync();
+                }
+                else
+                {
+                    StatusMessage = "Not connected to Spotify";
+                    UserPlaylists.Clear();
+                    ShowPlaylists = false;
+                    SelectedPlaylist = null;
+                    PlaylistTracks.Clear();
+                    IsNext = false;
+
+                    // Reset playlist stats
+                    UpdatePlaylistStats();
+                }
+            });
+        }
+
+        private void LibraryVM_AudioFilesModified(object? sender, EventArgs e)
+        {
+            if (PlaylistTracks.Any())
+            {
+                Task.Run(async () =>
+                {
+                    IsLoading = true;
+                    IsNext = false;
+
+                    await FindTracksLocalAsync(PlaylistTracks.ToList());
+
+                    Application.Current.Dispatcher.Invoke(() =>
+                    {
+                        UpdatePlaylistStats();
+
+                        if (PlaylistTracks.Any(x => x.IsLocal))
+                            IsNext = true;
+
+                        IsLoading = false;
+                    });
+                });
+            }
+        }
+
+        partial void OnSelectedPlaylistChanged(PlaylistInfo? value)
+        {
+            if (value != null)
+            {
+                _ = LoadPlaylistAsync(value);
+            }
         }
     }
-
 }

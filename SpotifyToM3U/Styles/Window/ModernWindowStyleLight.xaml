@@ -18,10 +18,6 @@
                 Value="400" />
         <Setter Property="MinWidth"
                 Value="700" />
-        <Setter Property="MaxHeight"
-                Value="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" />
-        <Setter Property="MaxWidth"
-                Value="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" />
         <Setter Property="UseLayoutRounding"
                 Value="True" />
         <Setter Property="TextOptions.TextFormattingMode"
@@ -41,8 +37,9 @@
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
                     <Grid>
-                        <!-- Drop Shadow -->
-                        <Border Margin="10"
+                        <!-- Drop Shadow (only when not maximized) -->
+                        <Border x:Name="DropShadow"
+                                Margin="10"
                                 Background="Black"
                                 Opacity="0.3"
                                 CornerRadius="16"
@@ -58,10 +55,8 @@
                                 BorderThickness="1"
                                 BorderBrush="#E0E0E0"
                                 CornerRadius="12"
+                                Background="White"
                                 ClipToBounds="True">
-                            <Border.Resources>
-                                <core:WindowConverter x:Key="windowConverter" />
-                            </Border.Resources>
 
                             <Grid>
                                 <Grid.RowDefinitions>
@@ -106,46 +101,50 @@
                                 </Grid>
 
                                 <!-- Content Area -->
-                                <Border Grid.Row="1"
+                                <Border x:Name="ContentBorder"
+                                        Grid.Row="1"
                                         Background="White"
                                         CornerRadius="0,0,12,12"
                                         ClipToBounds="True">
                                     <ContentPresenter />
                                 </Border>
                             </Grid>
-
-                            <!-- Window Border Styling -->
-                            <Border.Style>
-                                <Style TargetType="Border">
-                                    <Setter Property="Background"
-                                            Value="White" />
-                                    <Style.Triggers>
-                                        <!-- Maximized State -->
-                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource TemplatedParent}}"
-                                                     Value="Maximized">
-                                            <Setter Property="CornerRadius"
-                                                    Value="0" />
-                                            <Setter Property="Margin"
-                                                    Value="0" />
-                                        </DataTrigger>
-
-                                        <!-- Active/Inactive States -->
-                                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource TemplatedParent}}"
-                                                     Value="False">
-                                            <Setter Property="BorderBrush"
-                                                    Value="#D0D0D0" />
-                                        </DataTrigger>
-
-                                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource TemplatedParent}}"
-                                                     Value="True">
-                                            <Setter Property="BorderBrush"
-                                                    Value="#FF99CE9C" />
-                                        </DataTrigger>
-                                    </Style.Triggers>
-                                </Style>
-                            </Border.Style>
                         </Border>
                     </Grid>
+
+                    <ControlTemplate.Triggers>
+                        <!-- Maximized State -->
+                        <Trigger Property="WindowState"
+                                 Value="Maximized">
+                            <Setter TargetName="WindowBorder"
+                                    Property="Margin"
+                                    Value="0" />
+                            <Setter TargetName="WindowBorder"
+                                    Property="CornerRadius"
+                                    Value="0" />
+                            <Setter TargetName="ContentBorder"
+                                    Property="CornerRadius"
+                                    Value="0" />
+                            <Setter TargetName="DropShadow"
+                                    Property="Visibility"
+                                    Value="Collapsed" />
+                        </Trigger>
+
+                        <!-- Active/Inactive States -->
+                        <Trigger Property="IsActive"
+                                 Value="False">
+                            <Setter TargetName="WindowBorder"
+                                    Property="BorderBrush"
+                                    Value="#D0D0D0" />
+                        </Trigger>
+
+                        <Trigger Property="IsActive"
+                                 Value="True">
+                            <Setter TargetName="WindowBorder"
+                                    Property="BorderBrush"
+                                    Value="#FF99CE9C" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
@@ -163,77 +162,6 @@
                                       UseAeroCaptionButtons="False" />
                     </Setter.Value>
                 </Setter>
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!-- Enhanced Control View Styles -->
-    <Style x:Key="WindowControlButton"
-           TargetType="Button">
-        <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
-                Value="True" />
-        <Setter Property="Background"
-                Value="Transparent" />
-        <Setter Property="BorderThickness"
-                Value="0" />
-        <Setter Property="Width"
-                Value="46" />
-        <Setter Property="Height"
-                Value="32" />
-        <Setter Property="FontFamily"
-                Value="Segoe MDL2 Assets" />
-        <Setter Property="FontSize"
-                Value="10" />
-        <Setter Property="Foreground"
-                Value="#2E2E2E" />
-        <Setter Property="HorizontalContentAlignment"
-                Value="Center" />
-        <Setter Property="VerticalContentAlignment"
-                Value="Center" />
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="Button">
-                    <Border Background="{TemplateBinding Background}"
-                            CornerRadius="4"
-                            Margin="2">
-                        <ContentPresenter HorizontalAlignment="Center"
-                                          VerticalAlignment="Center" />
-                    </Border>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
-                <Setter Property="Background"
-                        Value="#F0F0F0" />
-            </Trigger>
-            <Trigger Property="IsPressed"
-                     Value="True">
-                <Setter Property="Background"
-                        Value="#E0E0E0" />
-            </Trigger>
-        </Style.Triggers>
-    </Style>
-
-    <!-- Close Button with Red Hover -->
-    <Style x:Key="WindowCloseButton"
-           TargetType="Button"
-           BasedOn="{StaticResource WindowControlButton}">
-        <Style.Triggers>
-            <Trigger Property="IsMouseOver"
-                     Value="True">
-                <Setter Property="Background"
-                        Value="#E81123" />
-                <Setter Property="Foreground"
-                        Value="White" />
-            </Trigger>
-            <Trigger Property="IsPressed"
-                     Value="True">
-                <Setter Property="Background"
-                        Value="#C50E1F" />
-                <Setter Property="Foreground"
-                        Value="White" />
             </Trigger>
         </Style.Triggers>
     </Style>
