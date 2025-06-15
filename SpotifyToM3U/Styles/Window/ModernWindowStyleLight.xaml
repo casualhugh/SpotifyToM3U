@@ -15,9 +15,9 @@
         <Setter Property="WindowStyle"
                 Value="None" />
         <Setter Property="MinHeight"
-                Value="400" />
+                Value="500" />
         <Setter Property="MinWidth"
-                Value="700" />
+                Value="600" />
         <Setter Property="UseLayoutRounding"
                 Value="True" />
         <Setter Property="TextOptions.TextFormattingMode"

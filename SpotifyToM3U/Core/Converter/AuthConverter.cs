@@ -17,7 +17,7 @@ namespace SpotifyToM3U.Core.Converter
         {
             if (value is bool isAuthenticated)
             {
-                return isAuthenticated ? "🚪 Logout" : "🔑 Login to Spotify";
+                return isAuthenticated ? "🔒 Logout" : "🔑 Login to Spotify";
             }
             return "🔑 Login to Spotify";
         }

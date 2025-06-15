@@ -12,9 +12,7 @@
         Style="{StaticResource ModernWindowStyleLight}"
         Title="Spotify to M3U Converter"
         Height="500"
-        Width="900"
-        MinHeight="450"
-        MinWidth="800"
+        Width="800"
         Icon="\Recources\Images\spotify_icon.png">
 
     <Window.TaskbarItemInfo>
