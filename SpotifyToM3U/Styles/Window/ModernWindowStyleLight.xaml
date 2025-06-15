@@ -2,21 +2,29 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:core="clr-namespace:SpotifyToM3U.Core.Converter"
                     xmlns:windowheaderstyles="clr-namespace:SpotifyToM3U.MVVM.View.Windows">
-    <Style x:Key="ModernWindowStyleLight"  TargetType="{x:Type Window}">
-        <Setter Property="AllowsTransparency" Value="True"/>
-        <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="ResizeMode" Value="CanResize"/>
-        <Setter Property="WindowStyle" Value="None"/>
-        <Setter Property="MinHeight" Value="300"/>
-        <Setter Property="MinWidth" Value="600"/>
-        <Setter Property="MaxHeight" Value="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}"/>
-        <Setter Property="MaxWidth" Value="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}"/>
+    <Style x:Key="ModernWindowStyleLight"
+           TargetType="{x:Type Window}">
+        <Setter Property="AllowsTransparency"
+                Value="True" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="ResizeMode"
+                Value="CanResize" />
+        <Setter Property="WindowStyle"
+                Value="None" />
+        <Setter Property="MinHeight"
+                Value="300" />
+        <Setter Property="MinWidth"
+                Value="600" />
+        <Setter Property="MaxHeight"
+                Value="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" />
+        <Setter Property="MaxWidth"
+                Value="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome
-                   CaptionHeight="50"
-                   CornerRadius="8"
-                   ResizeBorderThickness="5"/>
+                <WindowChrome CaptionHeight="80"
+                              CornerRadius="8"
+                              ResizeBorderThickness="5" />
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
@@ -42,10 +50,9 @@
                                        Height="30"
                                        HorizontalAlignment="Left"
                                        Margin="10" />
-                                <windowheaderstyles:ControlView Grid.Column="1"/>
+                                <windowheaderstyles:ControlView Grid.Column="1" />
 
                             </Grid>
-
 
                             <ContentPresenter Grid.Row="1" />
                         </Grid>
@@ -53,15 +60,18 @@
                             <Style TargetType="Border">
                                 <Setter Property="CornerRadius"
                                         Value="8" />
-                                <Setter Property="Background" >
+                                <Setter Property="Background">
                                     <Setter.Value>
-                                        <LinearGradientBrush EndPoint="1,0" StartPoint="0,1">
-                                            
+                                        <LinearGradientBrush EndPoint="1,0"
+                                                             StartPoint="0,1">
+
                                             <!--FF99BDCE-->
-                                            <GradientStop Color="White" Offset="0.0"/>
-                                            <GradientStop Color="#FF99CE9C" Offset="0.7" />
+                                            <GradientStop Color="White"
+                                                          Offset="0.0" />
+                                            <GradientStop Color="#FF99CE9C"
+                                                          Offset="0.7" />
                                         </LinearGradientBrush>
-                                        
+
                                     </Setter.Value>
                                 </Setter>
                                 <Style.Triggers>

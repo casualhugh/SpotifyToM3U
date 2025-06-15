@@ -10,29 +10,185 @@
              mc:Ignorable="d"
              d:DesignHeight="450"
              d:DesignWidth="800">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernActionButton"
+               TargetType="Button"
+               BasedOn="{StaticResource MenuButtonStyle}">
+            <Setter Property="Height"
+                    Value="40" />
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+            <Setter Property="Margin"
+                    Value="0,0,12,0" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="4"
+                                      Direction="270"
+                                      ShadowDepth="2"
+                                      Opacity="0.3" />
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver"
+                         Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="1.05"
+                                            ScaleY="1.05" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+                <Trigger Property="IsPressed"
+                         Value="True">
+                    <Setter Property="RenderTransform">
+                        <Setter.Value>
+                            <ScaleTransform ScaleX="0.98"
+                                            ScaleY="0.98" />
+                        </Setter.Value>
+                    </Setter>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+
+        <!-- Storyboards for Animations -->
+        <Storyboard x:Key="FadeInAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0"
+                             To="1"
+                             Duration="0:0:0.3" />
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                             From="0.8"
+                             To="1"
+                             Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <BackEase EasingMode="EaseOut"
+                              Amplitude="0.3" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                             From="0.8"
+                             To="1"
+                             Duration="0:0:0.3">
+                <DoubleAnimation.EasingFunction>
+                    <BackEase EasingMode="EaseOut"
+                              Amplitude="0.3" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+        </Storyboard>
+
+        <Storyboard x:Key="SlideUpAnimation">
+            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(TranslateTransform.Y)"
+                             From="20"
+                             To="0"
+                             Duration="0:0:0.4">
+                <DoubleAnimation.EasingFunction>
+                    <CubicEase EasingMode="EaseOut" />
+                </DoubleAnimation.EasingFunction>
+            </DoubleAnimation>
+            <DoubleAnimation Storyboard.TargetProperty="Opacity"
+                             From="0"
+                             To="1"
+                             Duration="0:0:0.4" />
+        </Storyboard>
+    </UserControl.Resources>
+
     <Grid>
-        <Grid.Resources>
-            <BooleanToVisibilityConverter x:Key="BoolToVis" />
-        </Grid.Resources>
         <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
             <RowDefinition Height="*" />
             <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
+
+        <!-- Header Section -->
         <Border Grid.Row="0"
-                Background="White"
-                CornerRadius="8"
-                Margin="10"
+                Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                Padding="20,15"
+                Margin="10,10,10,0"
+                CornerRadius="8,8,0,0"
                 BorderBrush="#E0E0E0"
-                BorderThickness="1">
+                BorderThickness="1,1,1,0">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0"
+                            Orientation="Vertical">
+                    <TextBlock Text="Audio Library"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="#2E2E2E"
+                               Margin="0,0,0,4" />
+                    <TextBlock Text="{Binding StatusText}"
+                               FontSize="13"
+                               Foreground="#666666"
+                               FontStyle="Italic" />
+                </StackPanel>
+
+                <!-- File Counter -->
+                <Border Grid.Column="1"
+                        Background="#FF99CE9C"
+                        CornerRadius="15"
+                        Padding="12,6"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Text="📁"
+                                   FontSize="14"
+                                   Margin="0,0,6,0" />
+                        <TextBlock Text="{Binding AudioFiles.Count}"
+                                   FontWeight="Bold"
+                                   FontSize="14"
+                                   Foreground="White" />
+                        <TextBlock Text=" files"
+                                   FontSize="12"
+                                   Foreground="White"
+                                   Margin="2,0,0,0" />
+                    </StackPanel>
+                </Border>
+            </Grid>
+        </Border>
+
+        <!-- DataGrid Section -->
+        <Border Grid.Row="1"
+                Background="White"
+                Margin="10,0"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1,0,1,1"
+                CornerRadius="0,0,8,8">
             <DataGrid x:Name="AudioFilesDataGrid"
                       Style="{StaticResource ModernDataGridStyle}"
                       ItemsSource="{Binding AudioFiles}"
                       MinHeight="200"
-                      Margin="0">
+                      Margin="0"
+                      VirtualizingPanel.IsVirtualizing="True"
+                      VirtualizingPanel.VirtualizationMode="Recycling"
+                      VirtualizingPanel.IsContainerVirtualizable="True"
+                      EnableRowVirtualization="True"
+                      EnableColumnVirtualization="True">
+                <DataGrid.RenderTransform>
+                    <ScaleTransform ScaleX="1"
+                                    ScaleY="1" />
+                </DataGrid.RenderTransform>
+                <DataGrid.Triggers>
+                    <EventTrigger RoutedEvent="Loaded">
+                        <BeginStoryboard Storyboard="{StaticResource FadeInAnimation}" />
+                    </EventTrigger>
+                </DataGrid.Triggers>
+
                 <DataGrid.Columns>
-                    <DataGridTextColumn Width="200"
+                    <DataGridTextColumn Width="220"
                                         Binding="{Binding Title, UpdateSourceTrigger=PropertyChanged}"
-                                        Header="Title"
+                                        Header="🎵 Title"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -42,13 +198,15 @@
                                         Value="Center" />
                                 <Setter Property="FontWeight"
                                         Value="Medium" />
+                                <Setter Property="TextTrimming"
+                                        Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Width="150"
+                    <DataGridTextColumn Width="160"
                                         Binding="{Binding Artists[0], UpdateSourceTrigger=PropertyChanged}"
-                                        Header="Artist"
+                                        Header="🎤 Artist"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -56,13 +214,15 @@
                                         Value="8,0" />
                                 <Setter Property="VerticalAlignment"
                                         Value="Center" />
+                                <Setter Property="TextTrimming"
+                                        Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
-                    <DataGridTextColumn Width="150"
+                    <DataGridTextColumn Width="160"
                                         Binding="{Binding Album, UpdateSourceTrigger=PropertyChanged}"
-                                        Header="Album"
+                                        Header="💿 Album"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -70,13 +230,15 @@
                                         Value="8,0" />
                                 <Setter Property="VerticalAlignment"
                                         Value="Center" />
+                                <Setter Property="TextTrimming"
+                                        Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Width="100"
                                         Binding="{Binding Genre, UpdateSourceTrigger=PropertyChanged}"
-                                        Header="Genre"
+                                        Header="🎭 Genre"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -84,13 +246,15 @@
                                         Value="8,0" />
                                 <Setter Property="VerticalAlignment"
                                         Value="Center" />
+                                <Setter Property="TextTrimming"
+                                        Value="CharacterEllipsis" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
 
                     <DataGridTextColumn Width="80"
                                         Binding="{Binding Year, UpdateSourceTrigger=PropertyChanged}"
-                                        Header="Year"
+                                        Header="📅 Year"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -106,7 +270,7 @@
 
                     <DataGridTextColumn Width="80"
                                         Binding="{Binding Extension}"
-                                        Header="Format"
+                                        Header="🔧 Format"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -120,6 +284,10 @@
                                         Value="Consolas" />
                                 <Setter Property="FontWeight"
                                         Value="SemiBold" />
+                                <Setter Property="Background"
+                                        Value="#F8F9FA" />
+                                <Setter Property="TextAlignment"
+                                        Value="Center" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
@@ -127,7 +295,7 @@
                     <DataGridTextColumn Width="*"
                                         MinWidth="200"
                                         Binding="{Binding Location}"
-                                        Header="Location"
+                                        Header="📂 Location"
                                         IsReadOnly="True">
                         <DataGridTextColumn.ElementStyle>
                             <Style TargetType="TextBlock">
@@ -139,6 +307,10 @@
                                         Value="CharacterEllipsis" />
                                 <Setter Property="ToolTip"
                                         Value="{Binding Text, RelativeSource={RelativeSource Self}}" />
+                                <Setter Property="FontFamily"
+                                        Value="Consolas" />
+                                <Setter Property="FontSize"
+                                        Value="11" />
                             </Style>
                         </DataGridTextColumn.ElementStyle>
                     </DataGridTextColumn>
@@ -146,132 +318,255 @@
             </DataGrid>
         </Border>
 
-        <!-- Bottom control panel -->
-        <Grid Grid.Row="1"
-              Margin="10,0,10,10">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto" />
-                <ColumnDefinition Width="*" />
-                <ColumnDefinition Width="Auto" />
-            </Grid.ColumnDefinitions>
+        <!-- Progress Section -->
+        <Border Grid.Row="2"
+                Margin="10,8,10,0"
+                Visibility="{Binding ShowProgressBar, Converter={StaticResource BoolToVis}}">
+            <Border.RenderTransform>
+                <TranslateTransform Y="0" />
+            </Border.RenderTransform>
+            <Border.Triggers>
+                <EventTrigger RoutedEvent="Border.Loaded">
+                    <BeginStoryboard Storyboard="{StaticResource SlideUpAnimation}" />
+                </EventTrigger>
+            </Border.Triggers>
 
-            <!-- Left side controls -->
-            <StackPanel Grid.Column="0"
-                        Orientation="Horizontal">
-                <StackPanel.Resources>
-                    <core:BindingProxy x:Key="Proxy"
-                                       Data="{Binding}" />
-                </StackPanel.Resources>
+            <Border Background="White"
+                    CornerRadius="12"
+                    BorderBrush="#E0E0E0"
+                    BorderThickness="1"
+                    Padding="20,15">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
 
-                <Button Content="Add Files..."
-                        HorizontalAlignment="Left"
-                        Width="90"
-                        Tag="#FF37A3E6"
-                        Background="LightSkyBlue"
-                        Margin="0,0,10,0"
-                        Height="35">
-                    <Button.ContextMenu>
-                        <ContextMenu>
-                            <MenuItem Header="Add File"
-                                      Command="{Binding Source={StaticResource Proxy}, Path=Data.AddFileCommand}" />
-                            <MenuItem Header="Add Folder"
-                                      Command="{Binding Source={StaticResource Proxy}, Path=Data.AddFolderCommand}" />
-                        </ContextMenu>
-                    </Button.ContextMenu>
+                    <!-- Progress Header -->
+                    <Grid Grid.Row="0"
+                          Margin="0,0,0,10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="Processing Files..."
+                                   FontSize="14"
+                                   FontWeight="SemiBold"
+                                   Foreground="#2E2E2E" />
+
+                        <Button Grid.Column="1"
+                                Content="✕ Cancel"
+                                Command="{Binding CancelOperationCommand}"
+                                Background="#FFFF6B6B"
+                                Tag="#FFE74C3C"
+                                Style="{StaticResource ModernActionButton}"
+                                Height="28"
+                                Width="80"
+                                FontSize="11"
+                                Margin="0" />
+                    </Grid>
+
+                    <!-- Progress Bar -->
+                    <Border Grid.Row="1"
+                            Background="#F5F5F5"
+                            CornerRadius="10"
+                            Height="20"
+                            Margin="0,0,0,8">
+                        <Grid>
+                            <ProgressBar Value="{Binding ProgressValue}"
+                                         Minimum="0"
+                                         Maximum="1"
+                                         Background="Transparent"
+                                         Foreground="#FF7CDC8F"
+                                         BorderThickness="0"
+                                         Height="18"
+                                         Margin="1">
+                                <ProgressBar.Template>
+                                    <ControlTemplate TargetType="ProgressBar">
+                                        <Border Background="{TemplateBinding Background}"
+                                                CornerRadius="9">
+                                            <Grid>
+                                                <Border Name="PART_Track"
+                                                        Background="#F5F5F5"
+                                                        CornerRadius="9" />
+                                                <Border Name="PART_Indicator"
+                                                        Background="{TemplateBinding Foreground}"
+                                                        HorizontalAlignment="Left"
+                                                        CornerRadius="9" />
+                                            </Grid>
+                                        </Border>
+                                    </ControlTemplate>
+                                </ProgressBar.Template>
+                            </ProgressBar>
+                            <TextBlock Text="{Binding ProgressValue, StringFormat=P1}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#2E2E2E" />
+                        </Grid>
+                    </Border>
+
+                    <!-- Progress Details -->
+                    <Grid Grid.Row="2">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBlock Grid.Column="0"
+                                   Text="{Binding StatusText}"
+                                   FontSize="11"
+                                   Foreground="#666666"
+                                   TextTrimming="CharacterEllipsis" />
+
+                        <StackPanel Grid.Column="1"
+                                    Orientation="Horizontal">
+                            <TextBlock Text="{Binding ProcessedFilesCount}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#2E2E2E" />
+                            <TextBlock Text=" / "
+                                       FontSize="11"
+                                       Foreground="#666666" />
+                            <TextBlock Text="{Binding TotalFilesCount}"
+                                       FontSize="11"
+                                       FontWeight="Bold"
+                                       Foreground="#2E2E2E" />
+                        </StackPanel>
+                    </Grid>
+                </Grid>
+            </Border>
+        </Border>
+
+        <!-- Control Panel -->
+        <Border Grid.Row="3"
+                Background="{DynamicResource {x:Static SystemColors.WindowBrushKey}}"
+                Padding="20,15"
+                Margin="10,8,10,10"
+                CornerRadius="8"
+                BorderBrush="#E0E0E0"
+                BorderThickness="1">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="Auto" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Left side controls -->
+                <StackPanel Grid.Column="0"
+                            Orientation="Horizontal"
+                            VerticalAlignment="Center">
+                    <StackPanel.Resources>
+                        <core:BindingProxy x:Key="Proxy"
+                                           Data="{Binding}" />
+                    </StackPanel.Resources>
+
+                    <Button Content="➕ Add Files"
+                            Width="110"
+                            Tag="#FF37A3E6"
+                            Background="#FF74C7EC">
+                        <Button.ContextMenu>
+                            <ContextMenu>
+                                <MenuItem Header="📄 Add File"
+                                          Command="{Binding Source={StaticResource Proxy}, Path=Data.AddFileCommand}" />
+                                <MenuItem Header="📁 Add Folder"
+                                          Command="{Binding Source={StaticResource Proxy}, Path=Data.AddFolderCommand}" />
+                            </ContextMenu>
+                        </Button.ContextMenu>
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}"
+                                   BasedOn="{StaticResource ModernActionButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowProgressBar}"
+                                                 Value="True">
+                                        <Setter Property="IsEnabled"
+                                                Value="False" />
+                                        <Setter Property="Opacity"
+                                                Value="0.6" />
+                                    </DataTrigger>
+                                    <EventTrigger RoutedEvent="Click">
+                                        <EventTrigger.Actions>
+                                            <BeginStoryboard>
+                                                <Storyboard>
+                                                    <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
+                                                        <DiscreteBooleanKeyFrame KeyTime="0:0:0"
+                                                                                 Value="True" />
+                                                    </BooleanAnimationUsingKeyFrames>
+                                                </Storyboard>
+                                            </BeginStoryboard>
+                                        </EventTrigger.Actions>
+                                    </EventTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+
+                    <Button Content="🗑️ Clear All"
+                            Command="{Binding ClearCommand}"
+                            Width="100"
+                            Tag="#FFE74C3C"
+                            Background="#FFFF6B6B">
+                        <Button.Style>
+                            <Style TargetType="{x:Type Button}"
+                                   BasedOn="{StaticResource ModernActionButton}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ShowProgressBar}"
+                                                 Value="True">
+                                        <Setter Property="IsEnabled"
+                                                Value="False" />
+                                        <Setter Property="Opacity"
+                                                Value="0.6" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+
+                <!-- Next button on right -->
+                <Button Grid.Column="1"
+                        Content="➡️ Next Step"
+                        Command="{Binding SpotifyCommand}"
+                        IsEnabled="{Binding IsNext}"
+                        Width="120"
+                        Tag="#FF50C668"
+                        Background="#FF7CDC8F">
+                    <Button.RenderTransform>
+                        <ScaleTransform ScaleX="1"
+                                        ScaleY="1" />
+                    </Button.RenderTransform>
                     <Button.Style>
-                        <Style TargetType="{x:Type Button}"
-                               BasedOn="{StaticResource MenuButtonStyle}">
+                        <Style TargetType="Button"
+                               BasedOn="{StaticResource ModernActionButton}">
                             <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShowProgressBar}"
-                                             Value="True">
-                                    <Setter Property="IsEnabled"
-                                            Value="False" />
-                                </DataTrigger>
-                                <EventTrigger RoutedEvent="Click">
-                                    <EventTrigger.Actions>
+                                <Trigger Property="IsEnabled"
+                                         Value="True">
+                                    <Trigger.EnterActions>
                                         <BeginStoryboard>
                                             <Storyboard>
-                                                <BooleanAnimationUsingKeyFrames Storyboard.TargetProperty="ContextMenu.IsOpen">
-                                                    <DiscreteBooleanKeyFrame KeyTime="0:0:0"
-                                                                             Value="True" />
-                                                </BooleanAnimationUsingKeyFrames>
+                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
+                                                                 To="1.08"
+                                                                 Duration="0:0:0.2"
+                                                                 AutoReverse="True"
+                                                                 RepeatBehavior="2x" />
+                                                <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
+                                                                 To="1.08"
+                                                                 Duration="0:0:0.2"
+                                                                 AutoReverse="True"
+                                                                 RepeatBehavior="2x" />
                                             </Storyboard>
                                         </BeginStoryboard>
-                                    </EventTrigger.Actions>
-                                </EventTrigger>
+                                    </Trigger.EnterActions>
+                                </Trigger>
                             </Style.Triggers>
                         </Style>
                     </Button.Style>
                 </Button>
-
-                <Button Content="Clear All"
-                        Command="{Binding ClearCommand}"
-                        HorizontalAlignment="Left"
-                        Width="85"
-                        Tag="#FFE74C3C"
-                        Background="#FFFF6B6B"
-                        Height="35">
-                    <Button.Style>
-                        <Style TargetType="{x:Type Button}"
-                               BasedOn="{StaticResource MenuButtonStyle}">
-                            <Style.Triggers>
-                                <DataTrigger Binding="{Binding ShowProgressBar}"
-                                             Value="True">
-                                    <Setter Property="IsEnabled"
-                                            Value="False" />
-                                </DataTrigger>
-                            </Style.Triggers>
-                        </Style>
-                    </Button.Style>
-                </Button>
-            </StackPanel>
-
-            <!-- Progress bar in center -->
-            <Grid Grid.Column="1"
-                  Width="300"
-                  HorizontalAlignment="Center"
-                  Margin="20,0"
-                  Visibility="{Binding ShowProgressBar,Converter={StaticResource BoolToVis}}">
-                <Border Background="White"
-                        CornerRadius="18"
-                        BorderBrush="#E0E0E0"
-                        BorderThickness="1"
-                        Height="36">
-                    <Grid>
-                        <ProgressBar Height="32"
-                                     Margin="2"
-                                     Minimum="0"
-                                     Maximum="1"
-                                     Value="{Binding ProgressValue,UpdateSourceTrigger=PropertyChanged,Mode=OneWay,Delay=1000}"
-                                     Foreground="#FF7CDC8F"
-                                     Background="Transparent"
-                                     BorderThickness="0">
-                            <ProgressBar.Clip>
-                                <RectangleGeometry RadiusX="16"
-                                                   RadiusY="16"
-                                                   Rect="0,0,296,32" />
-                            </ProgressBar.Clip>
-                        </ProgressBar>
-                        <TextBlock Text="{Binding ProgressValue,Mode=OneWay,Delay=1000, StringFormat=P1}"
-                                   VerticalAlignment="Center"
-                                   HorizontalAlignment="Center"
-                                   Foreground="#2E2E2E"
-                                   FontSize="14"
-                                   FontWeight="SemiBold" />
-                    </Grid>
-                </Border>
             </Grid>
-
-            <!-- Next button on right -->
-            <Button Grid.Column="2"
-                    Content="Next"
-                    Style="{StaticResource MenuButtonStyle}"
-                    Command="{Binding SpotifyCommand}"
-                    IsEnabled="{Binding IsNext}"
-                    Width="85"
-                    Tag="#FF50C668"
-                    Background="#FF7CDC8F"
-                    Height="35" />
-        </Grid>
+        </Border>
     </Grid>
 </UserControl>
