@@ -1,4 +1,5 @@
-﻿using System.Windows;
+﻿using SpotifyToM3U.Core;
+using System.Windows;
 
 namespace SpotifyToM3U.MVVM.View.Windows
 {
@@ -10,6 +11,7 @@ namespace SpotifyToM3U.MVVM.View.Windows
         public MainWindow()
         {
             InitializeComponent();
+            WindowMaximizationHelper.EnableProperMaximization(this);
         }
     }
 }

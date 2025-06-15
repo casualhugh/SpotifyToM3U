@@ -16,8 +16,7 @@
         ShowInTaskbar="False"
         Background="Transparent"
         PreviewKeyDown="CloseOnEsc"
-        WindowStartupLocation="CenterOwner"
-        Topmost="True">
+        WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
         <!-- Modern Input Field Style -->

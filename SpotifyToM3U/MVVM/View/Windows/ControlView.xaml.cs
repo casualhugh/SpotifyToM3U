@@ -61,6 +61,7 @@ namespace SpotifyToM3U.MVVM.View.Windows
         {
             if (_parentWindow != null)
             {
+                // Let WPF handle maximization - the WindowMaximizationHelper will constrain it properly
                 _parentWindow.WindowState = _parentWindow.WindowState == WindowState.Maximized
                     ? WindowState.Normal
                     : WindowState.Maximized;

@@ -18,6 +18,8 @@ namespace SpotifyToM3U.MVVM.View.Windows
         {
             InitializeComponent();
             AddFolderVM.Close += (_, _) => Hide();
+            if (Application.Current.MainWindow != null && Application.Current.MainWindow != this)
+                Owner = Application.Current.MainWindow;
         }
 
         private void CloseOnEsc(object sender, KeyEventArgs e)
@@ -32,8 +34,18 @@ namespace SpotifyToM3U.MVVM.View.Windows
         private void OnHeaderMouseDown(object sender, MouseButtonEventArgs e)
         {
             if (e.ChangedButton == MouseButton.Left)
-            {
                 DragMove();
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+
+            if (Owner != null)
+            {
+                WindowState = WindowState.Normal;
+                Activate();
+                Focus();
             }
         }
     }

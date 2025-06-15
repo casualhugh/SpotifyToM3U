@@ -18,11 +18,12 @@ namespace SpotifyToM3U.MVVM.View.Windows
 
             SpotifySetupVM viewModel = new();
             DataContext = viewModel;
-
-            // Subscribe to ViewModel events
             viewModel.RequestClose += OnRequestClose;
+            if (Application.Current.MainWindow != null && Application.Current.MainWindow != this)
+            {
+                Owner = Application.Current.MainWindow;
+            }
 
-            // Allow dragging the window
             MouseLeftButtonDown += (s, e) => DragMove();
         }
 
@@ -37,24 +38,29 @@ namespace SpotifyToM3U.MVVM.View.Windows
 
         protected override void OnKeyDown(KeyEventArgs e)
         {
-            if (e.Key == Key.Escape)
+            if (e.Key == Key.Escape && DataContext is SpotifySetupVM vm)
             {
-                if (DataContext is SpotifySetupVM vm)
-                {
-                    vm.CancelCommand.Execute(null);
-                }
+                vm.CancelCommand.Execute(null);
             }
             base.OnKeyDown(e);
         }
 
         protected override void OnClosed(EventArgs e)
         {
-            // Unsubscribe from events
             if (DataContext is SpotifySetupVM vm)
-            {
                 vm.RequestClose -= OnRequestClose;
-            }
             base.OnClosed(e);
+        }
+
+        protected override void OnSourceInitialized(EventArgs e)
+        {
+            base.OnSourceInitialized(e);
+            if (Owner != null)
+            {
+                WindowState = WindowState.Normal;
+                Activate();
+                Focus();
+            }
         }
     }
 }
