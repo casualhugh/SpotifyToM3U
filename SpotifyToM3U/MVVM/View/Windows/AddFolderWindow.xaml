@@ -3,96 +3,281 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows" xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:AddFolderVM}"
+        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows"
+        xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel"
+        d:DataContext="{d:DesignInstance Type=viewmodel:AddFolderVM}"
         mc:Ignorable="d"
-        Title="AddFolderWindow" Height="185" Width="420"
+        Title="Add Music Folder"
+        Height="320"
+        Width="400"
         ResizeMode="NoResize"
         AllowsTransparency="True"
         WindowStyle="None"
-        DataContext="{Binding}"
         ShowInTaskbar="False"
         Background="Transparent"
-        PreviewKeyDown="CloseOnEsc">
-    <Border Background="White" CornerRadius="10" >
-        <Grid Background="Transparent">
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="300"/>
-                <ColumnDefinition/>
-            </Grid.ColumnDefinitions>
-            <Button Grid.Column="1" 
-                    Command="{Binding BrowseCommand}"
-                    Style="{StaticResource MenuButtonStyle}" 
-                    BorderBrush="Gray" 
-                    BorderThickness="1"
-                    Background="#FFA0E2A0" 
-                    Tag="#FF70C870" 
-                    Content="Browse..."
-                    HorizontalAlignment="Left" 
-                    Margin="10,14,0,0" 
-                    VerticalAlignment="Top"
-                    Width="75"
-                    Height="20"/>
-            <StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Folder"
-                       HorizontalAlignment="Left" 
-                       Margin="10,10,0,0" 
-                       VerticalAlignment="Top" 
-                       RenderTransformOrigin="0.254,0.064" 
-                       Height="26" 
-                       Width="43"/>
-                    <TextBox Style="{StaticResource ModernTextBox}"
-                        HorizontalAlignment="Left"
-                        Height="23" Margin="28,16,0,0" TextWrapping="Wrap" Text="{Binding Path}" VerticalAlignment="Top" Width="208" HorizontalScrollBarVisibility="Auto" VerticalScrollBarVisibility="Disabled" MaxLines="1" TabIndex="1"/>
+        PreviewKeyDown="CloseOnEsc"
+        WindowStartupLocation="CenterOwner">
+
+    <Window.Resources>
+        <!-- Modern Input Field Style -->
+        <Style x:Key="ModernInputField"
+               TargetType="TextBox"
+               BasedOn="{StaticResource ModernTextBox}">
+            <Setter Property="Padding"
+                    Value="12,5" />
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="BorderBrush"
+                    Value="#E0E0E0" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Background"
+                    Value="White" />
+            <Setter Property="VerticalContentAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="TextBox">
+                        <Border Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6">
+                            <ScrollViewer x:Name="PART_ContentHost"
+                                          Margin="{TemplateBinding Padding}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsFocused"
+                                     Value="True">
+                                <Setter Property="BorderBrush"
+                                        Value="#FF7CDC8F" />
+                                <Setter Property="BorderThickness"
+                                        Value="2" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter Property="BorderBrush"
+                                        Value="#FF99CE9C" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Modern Button Style -->
+        <Style x:Key="ModernDialogButton"
+               TargetType="Button"
+               BasedOn="{StaticResource MenuButtonStyle}">
+            <Setter Property="Padding"
+                    Value="16,8" />
+            <Setter Property="Height"
+                    Value="30" />
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+        </Style>
+
+        <!-- Label Style -->
+        <Style x:Key="ModernLabel"
+               TargetType="TextBlock">
+            <Setter Property="FontSize"
+                    Value="13" />
+            <Setter Property="FontWeight"
+                    Value="Medium" />
+            <Setter Property="Foreground"
+                    Value="#2E2E2E" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="Margin"
+                    Value="0,0,0,6" />
+        </Style>
+
+        <!-- Checkbox Style -->
+        <Style x:Key="ModernCheckBox"
+               TargetType="ToggleButton"
+               BasedOn="{StaticResource ModernRadioButton}">
+            <Setter Property="HorizontalAlignment"
+                    Value="Left" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+        </Style>
+    </Window.Resources>
+
+    <Border Background="White"
+            CornerRadius="16"
+            BorderBrush="#E0E0E0"
+            BorderThickness="1">
+
+        <Grid>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+            </Grid.RowDefinitions>
+
+            <!-- Header -->
+            <Border Grid.Row="0"
+                    Background="#FF99CE9C"
+                    CornerRadius="16,16,0,0"
+                    Padding="24,5"
+                    MouseLeftButtonDown="OnHeaderMouseDown">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*" />
+                        <ColumnDefinition Width="Auto" />
+                    </Grid.ColumnDefinitions>
+
+                    <TextBlock Grid.Column="0"
+                               Text="📁 Add Music Folder"
+                               FontSize="16"
+                               FontWeight="Bold"
+                               Foreground="White"
+                               VerticalAlignment="Center" />
+
+                    <!-- Close Button -->
+                    <Button Grid.Column="1"
+                            Content="✕"
+                            Command="{Binding QuitCommand}"
+                            Width="28"
+                            Height="28"
+                            Background="Transparent"
+                            BorderThickness="0"
+                            Foreground="White"
+                            FontSize="14"
+                            FontWeight="Bold"
+                            Cursor="Hand"
+                            Opacity="0.8">
+                        <Button.Style>
+                            <Style TargetType="Button">
+                                <Setter Property="Template">
+                                    <Setter.Value>
+                                        <ControlTemplate TargetType="Button">
+                                            <Border Background="{TemplateBinding Background}"
+                                                    CornerRadius="14">
+                                                <ContentPresenter HorizontalAlignment="Center"
+                                                                  VerticalAlignment="Center" />
+                                            </Border>
+                                        </ControlTemplate>
+                                    </Setter.Value>
+                                </Setter>
+                                <Style.Triggers>
+                                    <Trigger Property="IsMouseOver"
+                                             Value="True">
+                                        <Setter Property="Background"
+                                                Value="#FFE74C3C" />
+                                        <Setter Property="Opacity"
+                                                Value="1" />
+                                    </Trigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </Grid>
+            </Border>
+
+            <!-- Content -->
+            <Grid Grid.Row="1"
+                  Margin="24,20,24,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <!-- Folder Path -->
+                <StackPanel Grid.Row="0"
+                            Margin="0,0,0,16">
+                    <TextBlock Text="📂 Folder Path"
+                               Style="{StaticResource ModernLabel}" />
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*" />
+                            <ColumnDefinition Width="Auto" />
+                        </Grid.ColumnDefinitions>
+
+                        <TextBox Grid.Column="0"
+                                 Text="{Binding Path, UpdateSourceTrigger=PropertyChanged}"
+                                 Style="{StaticResource ModernInputField}"
+                                 Margin="0,0,8,0"
+                                 TabIndex="1" />
+
+                        <Button Grid.Column="1"
+                                Content="📁 Browse"
+                                Command="{Binding BrowseCommand}"
+                                Background="#FF74C7EC"
+                                Tag="#FF37A3E6"
+                                BorderBrush="#FF37A3E6"
+                                Foreground="White"
+                                Style="{StaticResource ModernDialogButton}"
+                                MinWidth="80" />
+                    </Grid>
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label 
-                   Content="Extensions" 
-                        Margin="10,10,0,0" 
-                   HorizontalAlignment="Left"
-                   VerticalAlignment="Top" Height="26"
-                   Width="66"/>
 
-                    <TextBox Style="{StaticResource ModernTextBox}"
-                        Margin="5,16,0,0" HorizontalAlignment="Left"   TextWrapping="Wrap" Text="{Binding Extensions}" VerticalAlignment="Top" Width="208" TabIndex="3" />
+                <!-- File Extensions -->
+                <StackPanel Grid.Row="1"
+                            Margin="0,0,0,16">
+                    <TextBlock Text="🎵 File Extensions"
+                               Style="{StaticResource ModernLabel}" />
+                    <TextBox Text="{Binding Extensions, UpdateSourceTrigger=PropertyChanged}"
+                             Style="{StaticResource ModernInputField}"
+                             TabIndex="2" />
+                    <TextBlock Text="Comma-separated list (e.g., mp3,flac,wav)"
+                               FontSize="11"
+                               Foreground="#666666"
+                               Margin="2,4,0,0" />
                 </StackPanel>
-                <StackPanel Orientation="Horizontal">
-                    <Label Content="Search in subdirectories also"
-                       HorizontalAlignment="Left" 
-                       Margin="10,10,0,0" 
-                       VerticalAlignment="Top" 
-                       RenderTransformOrigin="0.254,0.064" 
-                       Height="26" />
-                    <ToggleButton Style="{StaticResource ModernRadioButton}"
-                          HorizontalAlignment="Left" 
-                          VerticalAlignment="Top"
-                                   Margin="10,10,0,0" 
-                          TabIndex="4"
-                          IsChecked="{Binding ScanSubdirectories}"/>
+
+                <!-- Subdirectories Option -->
+                <StackPanel Grid.Row="2"
+                            Orientation="Horizontal"
+                            Margin="0,0,0,8">
+                    <ToggleButton IsChecked="{Binding ScanSubdirectories}"
+                                  Style="{StaticResource ModernCheckBox}"
+                                  TabIndex="3"
+                                  Margin="0,0,12,0" />
+                    <TextBlock Text="🔍 Include Subdirectories"
+                               FontSize="13"
+                               FontWeight="Medium"
+                               Foreground="#2E2E2E"
+                               VerticalAlignment="Center" />
                 </StackPanel>
-            </StackPanel>
+            </Grid>
 
+            <!-- Footer -->
+            <Border Grid.Row="2"
+                    Background="#F8F9FA"
+                    CornerRadius="0,0,16,16"
+                    Padding="24,12">
+                <StackPanel Orientation="Horizontal"
+                            HorizontalAlignment="Right">
+                    <Button Content="❌ Cancel"
+                            Command="{Binding QuitCommand}"
+                            Background="#FFFF6B6B"
+                            Tag="#FFE74C3C"
+                            BorderBrush="#FFE74C3C"
+                            Foreground="White"
+                            Style="{StaticResource ModernDialogButton}"
+                            Margin="0,0,12,0"
+                            MinWidth="80" />
 
-            <Button Grid.Column="1" 
-                    Style="{StaticResource MenuButtonStyle}" 
-                    BorderBrush="Gray" 
-                    BorderThickness="1"
-                    Background="#FFE2A0CD" 
-
-                    Command="{Binding QuitCommand}"
-                    Tag="#FFD15BAB" 
-                    Content="Quit"
-                    HorizontalAlignment="Right" 
-                    Margin="0,0,10,10" 
-                    VerticalAlignment="Bottom"
-                    Width="50"
-                    Height="20"/>
-
-
-            <Button  Style="{StaticResource MenuButtonStyle}"
-                     Command="{Binding ScanCommand}" Tag="#FF7A92DF" BorderBrush="Gray" BorderThickness="1" Background="#FFBDA0E2" Content="Scan" Grid.ColumnSpan="2" HorizontalAlignment="Center" VerticalAlignment="Bottom" Width="75" Height="20" TabIndex="5" Margin="0,0,0,30" IsDefault="True"/>
-            
-            
+                    <Button Content="✅ Start Scan"
+                            Command="{Binding ScanCommand}"
+                            Background="#FF7CDC8F"
+                            Tag="#FF50C668"
+                            BorderBrush="#FF50C668"
+                            Foreground="White"
+                            Style="{StaticResource ModernDialogButton}"
+                            IsDefault="True"
+                            TabIndex="4"
+                            MinWidth="100" />
+                </StackPanel>
+            </Border>
         </Grid>
     </Border>
 </Window>

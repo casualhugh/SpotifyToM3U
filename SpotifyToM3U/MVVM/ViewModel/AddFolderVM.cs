@@ -2,11 +2,15 @@
 using CommunityToolkit.Mvvm.Input;
 using SpotifyToM3U.Core;
 using System;
+using System.IO;
 using System.Windows;
 using System.Windows.Forms;
 
 namespace SpotifyToM3U.MVVM.ViewModel
 {
+    /// <summary>
+    /// ViewModel for the Add Folder dialog
+    /// </summary>
     internal partial class AddFolderVM : ViewModelObject
     {
         [ObservableProperty]
@@ -14,6 +18,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
         [ObservableProperty]
         private string _extensions = "mp3,flac,wma,wav,aac,m4a";
+
         [ObservableProperty]
         private bool _scanSubdirectories = true;
 
@@ -21,6 +26,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
         private bool _result = false;
 
         public event EventHandler? Close;
+
         public AddFolderVM(INavigationService navigation) : base(navigation) { }
 
         [RelayCommand]
@@ -38,7 +44,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
         private void Scan()
         {
             string folder = Path.Trim();
-            if (!System.IO.Directory.Exists(folder))
+            if (!Directory.Exists(folder))
                 System.Windows.MessageBox.Show("Folder '" + folder + "' doesn't exist!", "Invalid folder", MessageBoxButton.OK, MessageBoxImage.Exclamation);
             else
             {

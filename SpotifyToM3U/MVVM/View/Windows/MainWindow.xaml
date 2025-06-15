@@ -3,73 +3,175 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows" xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel" d:DataContext="{d:DesignInstance Type=viewmodel:MainVM}"
+        xmlns:local="clr-namespace:SpotifyToM3U.MVVM.View.Windows"
+        xmlns:viewmodel="clr-namespace:SpotifyToM3U.MVVM.ViewModel"
+        d:DataContext="{d:DesignInstance Type=viewmodel:MainVM}"
         mc:Ignorable="d"
-        xmlns:ext="clr-namespace:SpotifyToM3U.Core" xmlns:con="clr-namespace:SpotifyToM3U.Core.Converter"
+        xmlns:ext="clr-namespace:SpotifyToM3U.Core"
+        xmlns:con="clr-namespace:SpotifyToM3U.Core.Converter"
         Style="{StaticResource ModernWindowStyleLight}"
-        Title="Spotify to M3U" Height="450" Width="800"
+        Title="Spotify to M3U Converter"
+        Height="500"
+        Width="900"
+        MinHeight="450"
+        MinWidth="800"
         Icon="\Recources\Images\spotify_icon.png">
+
     <Window.TaskbarItemInfo>
-        <TaskbarItemInfo Description="Application to convert Spotify playlists to local playlists" 
-                     ProgressValue="{Binding ProgressValue,Mode=OneWay}" ProgressState="{Binding TaskbarState,Mode=OneWay}">
+        <TaskbarItemInfo Description="Application to convert Spotify playlists to local playlists"
+                         ProgressValue="{Binding ProgressValue, Mode=OneWay}"
+                         ProgressState="{Binding TaskbarState, Mode=OneWay}">
         </TaskbarItemInfo>
     </Window.TaskbarItemInfo>
+
+    <Window.Resources>
+        <con:MultiValueEqualityConverter x:Key="converter" />
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+
+        <!-- Modern Navigation Button Style -->
+        <Style x:Key="ModernNavigationButton"
+               TargetType="{x:Type RadioButton}">
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="Height"
+                    Value="40" />
+            <Setter Property="Width"
+                    Value="120" />
+            <Setter Property="Margin"
+                    Value="0,0,8,0" />
+            <Setter Property="FontSize"
+                    Value="14" />
+            <Setter Property="FontWeight"
+                    Value="SemiBold" />
+            <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
+                    Value="True" />
+            <Setter Property="IsChecked">
+                <Setter.Value>
+                    <MultiBinding Converter="{StaticResource converter}"
+                                  Mode="OneWay">
+                        <Binding Path="CurrentName"
+                                 Mode="OneWay" />
+                        <Binding Path="CommandParameter"
+                                 RelativeSource="{RelativeSource Self}"
+                                 Mode="OneWay" />
+                    </MultiBinding>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Command"
+                    Value="{Binding ChangeViewCommand}" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                        <Border x:Name="Border"
+                                Background="Transparent"
+                                BorderBrush="#E0E0E0"
+                                BorderThickness="1"
+                                CornerRadius="8"
+                                Padding="12,8">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <!-- Icon -->
+                                <Image Grid.Column="0"
+                                       Source="{Binding Path=(ext:MarkupExtensions.Icon), RelativeSource={RelativeSource TemplatedParent}}"
+                                       Width="18"
+                                       Height="18"
+                                       Margin="0,0,8,0"
+                                       VerticalAlignment="Center"
+                                       RenderOptions.BitmapScalingMode="HighQuality" />
+
+                                <!-- Content -->
+                                <TextBlock Grid.Column="1"
+                                           Text="{TemplateBinding Content}"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"
+                                           Foreground="#2E2E2E"
+                                           VerticalAlignment="Center" />
+                            </Grid>
+                        </Border>
+
+                        <ControlTemplate.Triggers>
+                            <!-- Hover effect -->
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="Border"
+                                        Property="Background"
+                                        Value="#F8FFF8" />
+                                <Setter TargetName="Border"
+                                        Property="BorderBrush"
+                                        Value="#FF99CE9C" />
+                            </Trigger>
+
+                            <!-- Selected state -->
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="Border"
+                                        Property="Background"
+                                        Value="#E8F5E8" />
+                                <Setter TargetName="Border"
+                                        Property="BorderBrush"
+                                        Value="#FF7CDC8F" />
+                                <Setter TargetName="Border"
+                                        Property="BorderThickness"
+                                        Value="2" />
+                            </Trigger>
+
+                            <!-- Disabled state -->
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter TargetName="Border"
+                                        Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+    </Window.Resources>
+
     <Grid>
-        <Grid.Resources>
-            <con:MultiValueEqualityConverter x:Key="converter" />
-        </Grid.Resources>
         <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
         </Grid.RowDefinitions>
-        <StackPanel Margin="15,0,0,0" Orientation="Horizontal" Grid.Row="0">
-            <StackPanel.Resources>
-                <Style TargetType="{x:Type RadioButton}"
-                       BasedOn="{StaticResource MainMenuButton}">
-                    <Setter Property="IsChecked">
-                        <Setter.Value>
-                            <MultiBinding Converter="{StaticResource converter}"
-                                          Mode="OneWay">
-                                <Binding Path="CurrentName"
-                                         Mode="OneWay" />
-                                <Binding Path="CommandParameter"
-                                         RelativeSource="{RelativeSource Self}"
-                                         Mode="OneWay" />
-                            </MultiBinding>
-                        </Setter.Value>
-                    </Setter>
-                    <Setter Property="Command"
-                            Value="{Binding ChangeViewCommand}" />
-                    <Setter Property="Cursor"
-                            Value="Hand" />
-                    <Setter Property="Height"
-                            Value="40" />
-                    <Setter Property="Width"
-                            Value="120" />
-                    <Setter Property="FontSize"
-                            Value="14" />
-                    <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
-                            Value="True" />
-                </Style>
-            </StackPanel.Resources>
-            <RadioButton Content="Library"
-                          ext:MarkupExtensions.Icon="\Recources\Images\library.png"
-                         Margin="60,-45,0,0"
-                         CommandParameter="LibraryVM">
-            </RadioButton>
-            <RadioButton Content="Spotify"
-                         IsEnabled="{Binding EnableSpotify}"
-                         Margin="5,-45,0,0"
-                          ext:MarkupExtensions.Icon="\Recources\Images\spotify.png"
-                         CommandParameter="SpotifyVM" />
-            <RadioButton Content="Export"
-                         Margin="5,-45,0,0"
-                         IsEnabled="{Binding EnableExport}"
-                          ext:MarkupExtensions.Icon="\Recources\Images\export.png"
-                         CommandParameter="ExportVM" />
-        </StackPanel>
-        <ContentControl Grid.Row="1"
-                        Margin="10,0,10,10"
-                        Content="{Binding Navigation.CurrentView}" />
+
+        <!-- Navigation Tabs -->
+        <Border Grid.Row="0"
+                Background="White"
+                BorderBrush="#E0E0E0"
+                BorderThickness="0,0,0,1"
+                Padding="20,15">
+            <StackPanel Orientation="Horizontal">
+                <RadioButton Content="Library"
+                             ext:MarkupExtensions.Icon="\Recources\Images\library.png"
+                             CommandParameter="LibraryVM"
+                             Style="{StaticResource ModernNavigationButton}" />
+
+                <RadioButton Content="Spotify"
+                             ext:MarkupExtensions.Icon="\Recources\Images\spotify.png"
+                             CommandParameter="SpotifyVM"
+                             IsEnabled="{Binding EnableSpotify}"
+                             Style="{StaticResource ModernNavigationButton}" />
+
+                <RadioButton Content="Export"
+                             ext:MarkupExtensions.Icon="\Recources\Images\export.png"
+                             CommandParameter="ExportVM"
+                             IsEnabled="{Binding EnableExport}"
+                             Style="{StaticResource ModernNavigationButton}" />
+            </StackPanel>
+        </Border>
+
+        <!-- Content Area -->
+        <Border Grid.Row="1"
+                Background="#FAFAFA"
+                CornerRadius="0,0,12,12">
+            <ContentControl Content="{Binding Navigation.CurrentView}"
+                            Margin="10" />
+        </Border>
     </Grid>
 </Window>

@@ -2,6 +2,8 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
                     xmlns:core="clr-namespace:SpotifyToM3U.Core.Converter"
                     xmlns:windowheaderstyles="clr-namespace:SpotifyToM3U.MVVM.View.Windows">
+
+    <!-- Modern Window Style with improved aesthetics -->
     <Style x:Key="ModernWindowStyleLight"
            TargetType="{x:Type Window}">
         <Setter Property="AllowsTransparency"
@@ -13,108 +15,227 @@
         <Setter Property="WindowStyle"
                 Value="None" />
         <Setter Property="MinHeight"
-                Value="300" />
+                Value="400" />
         <Setter Property="MinWidth"
-                Value="600" />
+                Value="700" />
         <Setter Property="MaxHeight"
                 Value="{x:Static SystemParameters.MaximizedPrimaryScreenHeight}" />
         <Setter Property="MaxWidth"
                 Value="{x:Static SystemParameters.MaximizedPrimaryScreenWidth}" />
+        <Setter Property="UseLayoutRounding"
+                Value="True" />
+        <Setter Property="TextOptions.TextFormattingMode"
+                Value="Display" />
+        <Setter Property="TextOptions.TextRenderingMode"
+                Value="ClearType" />
         <Setter Property="WindowChrome.WindowChrome">
             <Setter.Value>
-                <WindowChrome CaptionHeight="80"
-                              CornerRadius="8"
-                              ResizeBorderThickness="5" />
+                <WindowChrome CaptionHeight="50"
+                              CornerRadius="12"
+                              ResizeBorderThickness="8"
+                              NonClientFrameEdges="None"
+                              UseAeroCaptionButtons="False" />
             </Setter.Value>
         </Setter>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Window">
-                    <Border BorderThickness="1"
-                            BorderBrush="#FFD9D9D9">
-                        <Border.Resources>
-                            <core:WindowConverter x:Key="windowConverterConverter" />
-                        </Border.Resources>
-                        <Grid>
-                            <Grid.RowDefinitions>
-                                <RowDefinition Height="Auto" />
-                                <RowDefinition />
-                            </Grid.RowDefinitions>
-                            <Grid>
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="Auto" />
-                                    <ColumnDefinition Width="*" />
-                                </Grid.ColumnDefinitions>
-                                <Image Source="{Binding Icon ,RelativeSource={RelativeSource TemplatedParent}}"
-                                       RenderOptions.BitmapScalingMode="Fant"
-                                       Height="30"
-                                       HorizontalAlignment="Left"
-                                       Margin="10" />
-                                <windowheaderstyles:ControlView Grid.Column="1" />
+                    <Grid>
+                        <!-- Drop Shadow -->
+                        <Border Margin="10"
+                                Background="Black"
+                                Opacity="0.3"
+                                CornerRadius="16"
+                                IsHitTestVisible="False">
+                            <Border.Effect>
+                                <BlurEffect Radius="10" />
+                            </Border.Effect>
+                        </Border>
 
+                        <!-- Main Window Border -->
+                        <Border x:Name="WindowBorder"
+                                Margin="10"
+                                BorderThickness="1"
+                                BorderBrush="#E0E0E0"
+                                CornerRadius="12"
+                                ClipToBounds="True">
+                            <Border.Resources>
+                                <core:WindowConverter x:Key="windowConverter" />
+                            </Border.Resources>
+
+                            <Grid>
+                                <Grid.RowDefinitions>
+                                    <RowDefinition Height="Auto" />
+                                    <RowDefinition Height="*" />
+                                </Grid.RowDefinitions>
+
+                                <!-- Title Bar -->
+                                <Grid Grid.Row="0"
+                                      Height="50"
+                                      Background="Transparent">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="Auto" />
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="Auto" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <!-- App Icon and Title -->
+                                    <StackPanel Grid.Column="0"
+                                                Orientation="Horizontal"
+                                                VerticalAlignment="Center"
+                                                Margin="16,0,0,0">
+                                        <Image Source="{Binding Icon, RelativeSource={RelativeSource TemplatedParent}}"
+                                               RenderOptions.BitmapScalingMode="HighQuality"
+                                               Width="20"
+                                               Height="20"
+                                               Margin="0,0,8,0" />
+                                        <TextBlock Text="{Binding Title, RelativeSource={RelativeSource TemplatedParent}}"
+                                                   FontSize="13"
+                                                   FontWeight="Medium"
+                                                   Foreground="#2E2E2E"
+                                                   VerticalAlignment="Center" />
+                                    </StackPanel>
+
+                                    <!-- Drag Area -->
+                                    <Rectangle Grid.Column="1"
+                                               Fill="Transparent"
+                                               WindowChrome.IsHitTestVisibleInChrome="False" />
+
+                                    <!-- Window Controls -->
+                                    <windowheaderstyles:ControlView Grid.Column="2" />
+                                </Grid>
+
+                                <!-- Content Area -->
+                                <Border Grid.Row="1"
+                                        Background="White"
+                                        CornerRadius="0,0,12,12"
+                                        ClipToBounds="True">
+                                    <ContentPresenter />
+                                </Border>
                             </Grid>
 
-                            <ContentPresenter Grid.Row="1" />
-                        </Grid>
-                        <Border.Style>
-                            <Style TargetType="Border">
-                                <Setter Property="CornerRadius"
-                                        Value="8" />
-                                <Setter Property="Background">
-                                    <Setter.Value>
-                                        <LinearGradientBrush EndPoint="1,0"
-                                                             StartPoint="0,1">
+                            <!-- Window Border Styling -->
+                            <Border.Style>
+                                <Style TargetType="Border">
+                                    <Setter Property="Background"
+                                            Value="White" />
+                                    <Style.Triggers>
+                                        <!-- Maximized State -->
+                                        <DataTrigger Binding="{Binding WindowState, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     Value="Maximized">
+                                            <Setter Property="CornerRadius"
+                                                    Value="0" />
+                                            <Setter Property="Margin"
+                                                    Value="0" />
+                                        </DataTrigger>
 
-                                            <!--FF99BDCE-->
-                                            <GradientStop Color="White"
-                                                          Offset="0.0" />
-                                            <GradientStop Color="#FF99CE9C"
-                                                          Offset="0.7" />
-                                        </LinearGradientBrush>
+                                        <!-- Active/Inactive States -->
+                                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     Value="False">
+                                            <Setter Property="BorderBrush"
+                                                    Value="#D0D0D0" />
+                                        </DataTrigger>
 
-                                    </Setter.Value>
-                                </Setter>
-                                <Style.Triggers>
+                                        <DataTrigger Binding="{Binding IsActive, RelativeSource={RelativeSource TemplatedParent}}"
+                                                     Value="True">
+                                            <Setter Property="BorderBrush"
+                                                    Value="#FF99CE9C" />
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </Border.Style>
+                        </Border>
+                    </Grid>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
 
-                                    <MultiDataTrigger>
-                                        <MultiDataTrigger.Conditions>
-                                            <Condition Value="False">
-                                                <Condition.Binding>
-                                                    <MultiBinding  Delay="1000"
-                                                                   Converter="{StaticResource windowConverterConverter}">
-                                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                                 Path="Height"
-                                                                 Mode="OneWay" />
-                                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                                 Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </Condition.Binding>
-                                            </Condition>
-                                            <Condition Value="False">
-                                                <Condition.Binding>
-                                                    <MultiBinding Delay="1000"
-                                                                  Converter="{StaticResource windowConverterConverter}">
-                                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                                 Path="Width"
-                                                                 Mode="OneWay" />
-                                                        <Binding RelativeSource="{RelativeSource TemplatedParent}"
-                                                                 Mode="OneWay" />
-                                                    </MultiBinding>
-                                                </Condition.Binding>
-                                            </Condition>
-                                            <Condition  Binding="{Binding RelativeSource={RelativeSource TemplatedParent}, Path=WindowState}"
-                                                        Value="Normal" />
-                                        </MultiDataTrigger.Conditions>
-                                        <Setter Property="CornerRadius"
-                                                Value="0" />
-                                    </MultiDataTrigger>
-                                </Style.Triggers>
-                            </Style>
-                        </Border.Style>
+        <!-- Window State Triggers -->
+        <Style.Triggers>
+            <Trigger Property="WindowState"
+                     Value="Maximized">
+                <Setter Property="WindowChrome.WindowChrome">
+                    <Setter.Value>
+                        <WindowChrome CaptionHeight="50"
+                                      CornerRadius="0"
+                                      ResizeBorderThickness="0"
+                                      NonClientFrameEdges="None"
+                                      UseAeroCaptionButtons="False" />
+                    </Setter.Value>
+                </Setter>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!-- Enhanced Control View Styles -->
+    <Style x:Key="WindowControlButton"
+           TargetType="Button">
+        <Setter Property="WindowChrome.IsHitTestVisibleInChrome"
+                Value="True" />
+        <Setter Property="Background"
+                Value="Transparent" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Width"
+                Value="46" />
+        <Setter Property="Height"
+                Value="32" />
+        <Setter Property="FontFamily"
+                Value="Segoe MDL2 Assets" />
+        <Setter Property="FontSize"
+                Value="10" />
+        <Setter Property="Foreground"
+                Value="#2E2E2E" />
+        <Setter Property="HorizontalContentAlignment"
+                Value="Center" />
+        <Setter Property="VerticalContentAlignment"
+                Value="Center" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border Background="{TemplateBinding Background}"
+                            CornerRadius="4"
+                            Margin="2">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
-
         </Setter>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="#F0F0F0" />
+            </Trigger>
+            <Trigger Property="IsPressed"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="#E0E0E0" />
+            </Trigger>
+        </Style.Triggers>
     </Style>
+
+    <!-- Close Button with Red Hover -->
+    <Style x:Key="WindowCloseButton"
+           TargetType="Button"
+           BasedOn="{StaticResource WindowControlButton}">
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="#E81123" />
+                <Setter Property="Foreground"
+                        Value="White" />
+            </Trigger>
+            <Trigger Property="IsPressed"
+                     Value="True">
+                <Setter Property="Background"
+                        Value="#C50E1F" />
+                <Setter Property="Foreground"
+                        Value="White" />
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
 </ResourceDictionary>

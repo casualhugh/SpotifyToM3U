@@ -13,6 +13,7 @@ namespace SpotifyToM3U.MVVM.View.Windows
     {
         private AddFolderVM AddFolderVM =
             App.Current.ServiceProvider.GetRequiredService<AddFolderVM>();
+
         public AddFolderWindow()
         {
             InitializeComponent();
@@ -25,6 +26,14 @@ namespace SpotifyToM3U.MVVM.View.Windows
             {
                 App.Current.ServiceProvider.GetRequiredService<AddFolderVM>().Result = false;
                 Hide();
+            }
+        }
+
+        private void OnHeaderMouseDown(object sender, MouseButtonEventArgs e)
+        {
+            if (e.ChangedButton == MouseButton.Left)
+            {
+                DragMove();
             }
         }
     }
