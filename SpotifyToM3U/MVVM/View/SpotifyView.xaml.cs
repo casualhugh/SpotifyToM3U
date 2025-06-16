@@ -3,7 +3,7 @@
 namespace SpotifyToM3U.MVVM.View
 {
     /// <summary>
-    /// Interaktionslogik für SpotifyView.xaml
+    /// Interaction logic for SpotifyView.xaml
     /// </summary>
     public partial class SpotifyView : UserControl
     {

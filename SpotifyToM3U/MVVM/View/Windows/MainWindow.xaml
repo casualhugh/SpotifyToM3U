@@ -15,6 +15,34 @@
         Width="800"
         Icon="\Recources\Images\spotify_icon.png">
 
+    <Window.InputBindings>
+        <KeyBinding Key="O"
+                    Modifiers="Ctrl"
+                    Command="{Binding LibraryAddFolderCommand}" />
+        <KeyBinding Key="O"
+                    Modifiers="Ctrl+Shift"
+                    Command="{Binding LibraryAddFileCommand}" />
+        <KeyBinding Key="E"
+                    Modifiers="Ctrl"
+                    Command="{Binding ExportCommand}" />
+        <KeyBinding Key="F5"
+                    Command="{Binding RefreshSpotifyCommand}" />
+        <KeyBinding Key="D1"
+                    Modifiers="Ctrl"
+                    Command="{Binding ChangeViewCommand}"
+                    CommandParameter="LibraryVM" />
+        <KeyBinding Key="D2"
+                    Modifiers="Ctrl"
+                    Command="{Binding ChangeViewCommand}"
+                    CommandParameter="SpotifyVM" />
+        <KeyBinding Key="D3"
+                    Modifiers="Ctrl"
+                    Command="{Binding ChangeViewCommand}"
+                    CommandParameter="ExportVM" />
+        <KeyBinding Key="Escape"
+                    Command="{Binding CancelCommand}" />
+    </Window.InputBindings>
+
     <Window.TaskbarItemInfo>
         <TaskbarItemInfo Description="Application to convert Spotify playlists to local playlists"
                          ProgressValue="{Binding ProgressValue, Mode=OneWay}"

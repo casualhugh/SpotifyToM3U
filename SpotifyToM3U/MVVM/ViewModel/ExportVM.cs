@@ -100,23 +100,32 @@ namespace SpotifyToM3U.MVVM.ViewModel
         [RelayCommand]
         private void Export()
         {
-            if (ExportPath.Length < 2)
-                Directory.CreateDirectory(ExportPath);
-            Directory.CreateDirectory(ExportPath);
-            File.Create(Path.Combine(ExportPath, IOManager.RemoveInvalidFileNameChars(_spotifyVM.PlaylistName) + ".m3u8")).Close();
-
-            List<string> files = new();
-            files.Add("#EXTM3U");
-            files.Add("#" + _spotifyVM.PlaylistName + ".m3u8");
-            for (int i = 0; i < _spotifyVM.PlaylistTracks.Count; i++)
+            try
             {
-                if (_spotifyVM.PlaylistTracks[i].IsLocal)
-                    files.Add(ExportAsRelativ ? _spotifyVM.PlaylistTracks[i].Path.Remove(0, _exportRoot.Length) : _spotifyVM.PlaylistTracks[i].Path);
-            }
-            File.WriteAllLines(Path.Combine(ExportPath, IOManager.RemoveInvalidFileNameChars(_spotifyVM.PlaylistName) + ".m3u8"), files);
+                Directory.CreateDirectory(ExportPath);
+                string playlistFileName = IOManager.RemoveInvalidFileNameChars(_spotifyVM.PlaylistName) + ".m3u8";
+                string fullPath = Path.Combine(ExportPath, playlistFileName);
+                List<string> files = new()
+        {
+            "#EXTM3U",
+            "#" + _spotifyVM.PlaylistName + ".m3u8"
+        };
 
-            ExportIsVisible = true;
+                List<string> exportPaths = _spotifyVM.PlaylistTracks.Select(track =>
+                    ExportAsRelativ ? track.Path.Remove(0, _exportRoot.Length) : track.Path).ToList();
+
+                files.AddRange(exportPaths);
+                File.WriteAllLines(fullPath, files);
+
+                ExportIsVisible = true;
+            }
+            catch (Exception ex)
+            {
+                System.Windows.MessageBox.Show($"Export error: {ex.Message}", "Error",
+                    System.Windows.MessageBoxButton.OK, System.Windows.MessageBoxImage.Error);
+            }
         }
+
         [RelayCommand]
         private void Browse()
         {
@@ -130,8 +139,5 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 else
                     MessageBox.Show("Invalid Path", "Info", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
-
-
-
     }
 }

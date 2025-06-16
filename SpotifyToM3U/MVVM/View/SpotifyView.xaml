@@ -12,64 +12,151 @@
              d:DesignHeight="450"
              d:DesignWidth="800">
 
+    <UserControl.InputBindings>
+        <!-- Keyboard Shortcuts -->
+        <KeyBinding Key="A"
+                    Modifiers="Ctrl"
+                    Command="{Binding SelectAllVisibleTracksCommand}" />
+        <KeyBinding Key="A"
+                    Modifiers="Ctrl+Shift"
+                    Command="{Binding DeselectAllVisibleTracksCommand}" />
+    </UserControl.InputBindings>
+
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
         <core:BindingProxy x:Key="proxy"
                            Data="{Binding}" />
 
-        <!-- Playlist Item Style -->
-        <Style x:Key="PlaylistItem"
-               TargetType="Border">
-            <Setter Property="Background"
-                    Value="White" />
-            <Setter Property="BorderBrush"
-                    Value="{StaticResource NeutralGrayBrush}" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="CornerRadius"
-                    Value="6" />
+        <!-- Modern Filter Button Style -->
+        <Style x:Key="FilterButton"
+               TargetType="Button">
+            <Setter Property="Height"
+                    Value="36" />
+            <Setter Property="MinWidth"
+                    Value="80" />
             <Setter Property="Margin"
                     Value="4" />
-            <Setter Property="Cursor"
-                    Value="Hand" />
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver"
-                         Value="True">
-                    <Setter Property="Background"
-                            Value="{StaticResource HoverLightBrush}" />
-                    <Setter Property="BorderBrush"
-                            Value="{StaticResource PrimaryGreenLightBrush}" />
-                </Trigger>
-                <DataTrigger Binding="{Binding IsSelected}"
-                             Value="True">
-                    <Setter Property="Background"
-                            Value="{StaticResource SelectedLightBrush}" />
-                    <Setter Property="BorderBrush"
-                            Value="{StaticResource PrimaryGreenBrush}" />
-                    <Setter Property="BorderThickness"
-                            Value="2" />
-                </DataTrigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Modern Button Style -->
-        <Style x:Key="SpotifyButton"
-               TargetType="Button"
-               BasedOn="{StaticResource MenuButtonStyle}">
-            <Setter Property="Height"
-                    Value="40" />
             <Setter Property="FontSize"
-                    Value="13" />
+                    Value="12" />
             <Setter Property="FontWeight"
                     Value="SemiBold" />
             <Setter Property="Cursor"
                     Value="Hand" />
-            <Setter Property="Effect">
+            <Setter Property="BorderThickness"
+                    Value="1" />
+            <Setter Property="Template">
                 <Setter.Value>
-                    <DropShadowEffect BlurRadius="4"
-                                      Direction="270"
-                                      ShadowDepth="2"
-                                      Opacity="0.3" />
+                    <ControlTemplate TargetType="Button">
+                        <Border x:Name="ButtonBorder"
+                                Background="{TemplateBinding Background}"
+                                BorderBrush="{TemplateBinding BorderBrush}"
+                                BorderThickness="{TemplateBinding BorderThickness}"
+                                CornerRadius="6"
+                                Padding="12,6">
+                            <ContentPresenter HorizontalAlignment="Center"
+                                              VerticalAlignment="Center" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Opacity"
+                                        Value="0.8" />
+                            </Trigger>
+                            <Trigger Property="IsPressed"
+                                     Value="True">
+                                <Setter TargetName="ButtonBorder"
+                                        Property="Opacity"
+                                        Value="0.6" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter Property="Opacity"
+                                        Value="0.3" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <!-- Selection Button Style -->
+        <Style x:Key="SelectionButton"
+               TargetType="Button"
+               BasedOn="{StaticResource FilterButton}">
+            <Setter Property="Background"
+                    Value="{StaticResource SecondaryBlueBrush}" />
+            <Setter Property="Foreground"
+                    Value="White" />
+            <Setter Property="BorderBrush"
+                    Value="{StaticResource SecondaryBlueBrush}" />
+            <Setter Property="Height"
+                    Value="32" />
+            <Setter Property="FontSize"
+                    Value="11" />
+            <Setter Property="MinWidth"
+                    Value="100" />
+        </Style>
+
+        <!-- Track Selection Checkbox Style -->
+        <Style x:Key="TrackCheckBox"
+               TargetType="CheckBox">
+            <Setter Property="Width"
+                    Value="20" />
+            <Setter Property="Height"
+                    Value="20" />
+            <Setter Property="Cursor"
+                    Value="Hand" />
+            <Setter Property="VerticalAlignment"
+                    Value="Center" />
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="CheckBox">
+                        <Border x:Name="CheckBoxBorder"
+                                Width="18"
+                                Height="18"
+                                CornerRadius="3"
+                                BorderBrush="{StaticResource NeutralMediumGrayBrush}"
+                                BorderThickness="2"
+                                Background="White">
+                            <TextBlock x:Name="CheckMark"
+                                       Text="✓"
+                                       FontSize="12"
+                                       FontWeight="Bold"
+                                       Foreground="{StaticResource PrimaryGreenBrush}"
+                                       HorizontalAlignment="Center"
+                                       VerticalAlignment="Center"
+                                       Visibility="Collapsed" />
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsChecked"
+                                     Value="True">
+                                <Setter TargetName="CheckMark"
+                                        Property="Visibility"
+                                        Value="Visible" />
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="{StaticResource PrimaryGreenBrush}" />
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="Background"
+                                        Value="{StaticResource SelectedLightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsMouseOver"
+                                     Value="True">
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="BorderBrush"
+                                        Value="{StaticResource PrimaryGreenLightBrush}" />
+                                <Setter TargetName="CheckBoxBorder"
+                                        Property="Background"
+                                        Value="{StaticResource HoverLightBrush}" />
+                            </Trigger>
+                            <Trigger Property="IsEnabled"
+                                     Value="False">
+                                <Setter Property="Opacity"
+                                        Value="0.5" />
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
                 </Setter.Value>
             </Setter>
         </Style>
@@ -140,18 +227,14 @@
                     <!-- Auth Button -->
                     <Button Content="{Binding IsAuthenticated, Converter={x:Static conv:AuthButtonConverter.Instance}}"
                             Command="{Binding AuthenticateCommand}"
-                            Background="{StaticResource PrimaryGreenBrush}"
-                            Foreground="White"
-                            Style="{StaticResource SpotifyButton}"
-                            MinWidth="120" />
+                            Style="{StaticResource PrimaryButton}"
+                            MinWidth="140" />
 
                     <!-- Refresh Playlists Button -->
                     <Button Content="🔄 Refresh"
                             Command="{Binding LoadUserPlaylistsCommand}"
                             Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVis}}"
-                            Background="{StaticResource PrimaryGreenLightBrush}"
-                            Foreground="White"
-                            Style="{StaticResource SpotifyButton}"
+                            Style="{StaticResource SecondaryButton}"
                             Margin="8,0,0,0"
                             MinWidth="100" />
                 </StackPanel>
@@ -193,13 +276,41 @@
                             <ItemsControl ItemsSource="{Binding UserPlaylists}">
                                 <ItemsControl.ItemTemplate>
                                     <DataTemplate>
-                                        <Border Style="{StaticResource PlaylistItem}"
+                                        <Border Background="Transparent"
+                                                BorderBrush="#F0F0F0"
+                                                BorderThickness="1"
+                                                CornerRadius="8"
+                                                Margin="4"
+                                                Cursor="Hand"
                                                 Padding="12">
                                             <Border.InputBindings>
                                                 <MouseBinding Gesture="LeftClick"
                                                               Command="{Binding Source={StaticResource proxy}, Path=Data.LoadPlaylistCommand}"
                                                               CommandParameter="{Binding}" />
                                             </Border.InputBindings>
+                                            <Border.Style>
+                                                <Style TargetType="Border">
+                                                    <Style.Triggers>
+                                                        <Trigger Property="IsMouseOver"
+                                                                 Value="True">
+                                                            <Setter Property="Background"
+                                                                    Value="{StaticResource HoverLightBrush}" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource PrimaryGreenLightBrush}" />
+                                                        </Trigger>
+                                                        <DataTrigger Binding="{Binding IsSelected}"
+                                                                     Value="True">
+                                                            <Setter Property="Background"
+                                                                    Value="{StaticResource SelectedLightBrush}" />
+                                                            <Setter Property="BorderBrush"
+                                                                    Value="{StaticResource PrimaryGreenBrush}" />
+                                                            <Setter Property="BorderThickness"
+                                                                    Value="2" />
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </Border.Style>
+
                                             <Grid>
                                                 <Grid.RowDefinitions>
                                                     <RowDefinition Height="Auto" />
@@ -262,15 +373,16 @@
 
                             <TextBox Text="{Binding PlaylistIDText, UpdateSourceTrigger=PropertyChanged}"
                                      Style="{StaticResource ModernInputField}"
-                                     Height="32"
-                                     Margin="0,0,0,8" />
+                                     Height="40"
+                                     Margin="0,0,0,12"
+                                     VerticalContentAlignment="Center"
+                                     FontSize="13" />
 
                             <Button Content="🔍 Load Playlist"
                                     Command="{Binding LoadPlaylistByIdCommand}"
-                                    Background="{StaticResource SecondaryBlueBrush}"
-                                    Foreground="White"
-                                    Style="{StaticResource SpotifyButton}"
-                                    HorizontalAlignment="Stretch" />
+                                    Style="{StaticResource SecondaryButton}"
+                                    HorizontalAlignment="Stretch"
+                                    Height="40" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -283,50 +395,108 @@
                 <Grid>
                     <Grid.RowDefinitions>
                         <RowDefinition Height="Auto" />
-                        <RowDefinition Height="*" />
                         <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" />
                     </Grid.RowDefinitions>
 
-                    <!-- Playlist Header -->
+                    <!-- Playlist Header/Overview -->
                     <Border Grid.Row="0"
-                            Background="#F8F9FA"
-                            CornerRadius="6"
-                            Padding="12"
-                            Margin="0,0,0,8"
-                            Visibility="{Binding SelectedPlaylist, Converter={StaticResource BoolToVis}}">
+                            Background="{StaticResource NeutralLightGrayBrush}"
+                            BorderBrush="{StaticResource NeutralGrayBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="16"
+                            Margin="0,0,0,12"
+                            Visibility="{Binding PlaylistTracks.Count, Converter={x:Static conv:CountToVisibilityConverter.Instance}}">
                         <Grid>
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="*" />
                                 <ColumnDefinition Width="Auto" />
                             </Grid.ColumnDefinitions>
 
-                            <StackPanel Grid.Column="0">
+                            <StackPanel Grid.Column="0"
+                                        VerticalAlignment="Center">
                                 <TextBlock Text="{Binding PlaylistName}"
-                                           FontSize="16"
+                                           FontSize="18"
                                            FontWeight="Bold"
                                            Foreground="{StaticResource NeutralDarkGrayBrush}" />
                                 <StackPanel Orientation="Horizontal"
                                             Margin="0,4,0,0">
-                                    <TextBlock FontSize="12"
-                                               Foreground="{StaticResource NeutralMediumGrayBrush}">
+                                    <TextBlock FontSize="13"
+                                               Foreground="{StaticResource NeutralMediumGrayBrush}"
+                                               VerticalAlignment="Center">
                                         <Run Text="{Binding PlaylistLength}" />
                                         <Run Text="tracks" />
                                     </TextBlock>
                                     <TextBlock Text="•"
-                                               FontSize="12"
+                                               FontSize="13"
                                                Margin="8,0"
-                                               Foreground="{StaticResource NeutralMediumGrayBrush}" />
-                                    <TextBlock FontSize="12"
-                                               Foreground="{StaticResource PrimaryGreenBrush}">
+                                               Foreground="{StaticResource NeutralMediumGrayBrush}"
+                                               VerticalAlignment="Center" />
+                                    <TextBlock FontSize="13"
+                                               Foreground="{StaticResource PrimaryGreenBrush}"
+                                               VerticalAlignment="Center">
                                         <Run Text="{Binding PlaylistFound}" />
-                                        <Run Text="found locally" />
+                                        <Run Text="found (" />
+                                        <Run>
+                                            <Run.Text>
+                                                <MultiBinding Converter="{x:Static conv:PercentageCalculatorConverter.Instance}">
+                                                    <Binding Path="PlaylistFound" />
+                                                    <Binding Path="PlaylistLength" />
+                                                </MultiBinding>
+                                            </Run.Text>
+                                        </Run>
+                                        <Run Text=")" />
                                     </TextBlock>
+                                </StackPanel>
+
+                                <!-- Match Quality Breakdown -->
+                                <StackPanel Orientation="Horizontal"
+                                            Margin="0,4,0,0">
+                                    <Border Style="{StaticResource SuccessBadge}"
+                                            Margin="0,0,4,0">
+                                        <TextBlock Text="{Binding PerfectMatches}"
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                    </Border>
+                                    <TextBlock Text="perfect"
+                                               FontSize="10"
+                                               Foreground="{StaticResource SuccessBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0" />
+
+                                    <Border Style="{StaticResource WarningBadge}"
+                                            Margin="0,0,4,0">
+                                        <TextBlock Text="{Binding WeakMatches}"
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                    </Border>
+                                    <TextBlock Text="need review"
+                                               FontSize="10"
+                                               Foreground="{StaticResource WarningBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="0,0,12,0" />
+
+                                    <Border Style="{StaticResource ErrorBadge}"
+                                            Margin="0,0,4,0">
+                                        <TextBlock Text="{Binding MissingTracks}"
+                                                   FontSize="10"
+                                                   FontWeight="Bold"
+                                                   Foreground="White" />
+                                    </Border>
+                                    <TextBlock Text="missing"
+                                               FontSize="10"
+                                               Foreground="{StaticResource ErrorBrush}"
+                                               VerticalAlignment="Center" />
                                 </StackPanel>
                             </StackPanel>
 
                             <Border Grid.Column="1"
-                                    Style="{StaticResource ModernBadge}">
-                                <TextBlock FontSize="12"
+                                    Style="{StaticResource ModernBadge}"
+                                    VerticalAlignment="Center">
+                                <TextBlock FontSize="14"
                                            FontWeight="Bold"
                                            Foreground="White">
                                     <Run Text="{Binding PlaylistFound}" />
@@ -337,16 +507,82 @@
                         </Grid>
                     </Border>
 
+                    <!-- Filter and Selection Controls -->
+                    <Border Grid.Row="1"
+                            Background="{StaticResource NeutralLightGrayBrush}"
+                            BorderBrush="{StaticResource NeutralGrayBrush}"
+                            BorderThickness="1"
+                            CornerRadius="8"
+                            Padding="12"
+                            Margin="0,0,0,12"
+                            Visibility="{Binding PlaylistTracks.Count, Converter={x:Static conv:CountToVisibilityConverter.Instance}}">
+                        <StackPanel>
+                            <!-- Filter Buttons -->
+                            <TextBlock Text="🔍 Filter Tracks"
+                                       Style="{StaticResource FormLabel}"
+                                       Margin="0,0,0,8" />
+                            <WrapPanel HorizontalAlignment="Center"
+                                       Margin="0,0,0,12">
+                                <Button Content="📋 Show All"
+                                        Command="{Binding ShowAllTracksCommand}"
+                                        Style="{StaticResource FilterButton}"
+                                        Background="{StaticResource PrimaryGreenBrush}"
+                                        Foreground="White"
+                                        BorderBrush="{StaticResource PrimaryGreenBrush}" />
+                                <Button Content="✅ Found Only"
+                                        Command="{Binding ShowFoundOnlyCommand}"
+                                        Style="{StaticResource FilterButton}"
+                                        Background="{StaticResource SuccessBrush}"
+                                        Foreground="White"
+                                        BorderBrush="{StaticResource SuccessBrush}" />
+                                <Button Content="❌ Missing Only"
+                                        Command="{Binding ShowMissingOnlyCommand}"
+                                        Style="{StaticResource FilterButton}"
+                                        Background="{StaticResource ErrorBrush}"
+                                        Foreground="White"
+                                        BorderBrush="{StaticResource ErrorBrush}" />
+                                <Button Content="⚠️ Need Review"
+                                        Command="{Binding ShowWeakMatchesCommand}"
+                                        Style="{StaticResource FilterButton}"
+                                        Background="{StaticResource WarningBrush}"
+                                        Foreground="White"
+                                        BorderBrush="{StaticResource WarningBrush}" />
+                            </WrapPanel>
+
+                            <!-- Selection Controls -->
+                            <Separator Margin="0,0,0,8" />
+                            <StackPanel Orientation="Horizontal"
+                                        HorizontalAlignment="Center">
+
+                                <StackPanel VerticalAlignment="Center">
+                                    <TextBlock HorizontalAlignment="Center"
+                                               FontSize="12"
+                                               FontWeight="SemiBold"
+                                               Foreground="{StaticResource NeutralDarkGrayBrush}">
+                                        <Run Text="{Binding SelectedForExport}" />
+                                        <Run Text="selected for export" />
+                                    </TextBlock>
+                                    <TextBlock HorizontalAlignment="Center"
+                                               FontSize="10"
+                                               Foreground="{StaticResource NeutralMediumGrayBrush}">
+                                        <Run Text="{Binding ExcludedFromExport}" />
+                                        <Run Text="excluded" />
+                                    </TextBlock>
+                                </StackPanel>
+                            </StackPanel>
+                        </StackPanel>
+                    </Border>
+
                     <!-- Tracks List -->
-                    <ScrollViewer Grid.Row="1"
+                    <ScrollViewer Grid.Row="2"
                                   VerticalScrollBarVisibility="Auto">
-                        <ItemsControl ItemsSource="{Binding PlaylistTracks}">
+                        <ItemsControl ItemsSource="{Binding FilteredTracks}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate>
                                     <Border Background="Transparent"
                                             BorderBrush="#F0F0F0"
                                             BorderThickness="0,0,0,1"
-                                            Padding="8">
+                                            Padding="12">
                                         <Border.Style>
                                             <Style TargetType="Border">
                                                 <Style.Triggers>
@@ -354,47 +590,114 @@
                                                                  Value="False">
                                                         <Setter Property="Opacity"
                                                                 Value="0.6" />
+                                                        <Setter Property="Cursor"
+                                                                Value="Arrow" />
                                                     </DataTrigger>
+                                                    <DataTrigger Binding="{Binding IsSelected}"
+                                                                 Value="False">
+                                                        <Setter Property="Background"
+                                                                Value="#FFF9F9" />
+                                                    </DataTrigger>
+                                                    <Trigger Property="IsMouseOver"
+                                                             Value="True">
+                                                        <Setter Property="Background"
+                                                                Value="{StaticResource HoverLightBrush}" />
+                                                    </Trigger>
+                                                    <MultiDataTrigger>
+                                                        <MultiDataTrigger.Conditions>
+                                                            <Condition Binding="{Binding IsLocal}"
+                                                                       Value="True" />
+                                                            <Condition Binding="{Binding IsSelected}"
+                                                                       Value="True" />
+                                                        </MultiDataTrigger.Conditions>
+                                                        <Setter Property="Background"
+                                                                Value="{StaticResource SelectedLightBrush}" />
+                                                    </MultiDataTrigger>
                                                 </Style.Triggers>
                                             </Style>
                                         </Border.Style>
+
                                         <Grid>
                                             <Grid.ColumnDefinitions>
                                                 <ColumnDefinition Width="32" />
+                                                <ColumnDefinition Width="40" />
                                                 <ColumnDefinition Width="*" />
+                                                <ColumnDefinition Width="Auto" />
                                                 <ColumnDefinition Width="Auto" />
                                             </Grid.ColumnDefinitions>
 
+                                            <!-- Selection Checkbox -->
+                                            <CheckBox Grid.Column="0"
+                                                      IsChecked="{Binding IsSelected, Mode=OneWay}"
+                                                      IsEnabled="{Binding IsLocal}"
+                                                      Style="{StaticResource TrackCheckBox}"
+                                                      VerticalAlignment="Center"
+                                                      Visibility="{Binding IsLocal, Converter={StaticResource BoolToVis}}">
+                                                <CheckBox.InputBindings>
+                                                    <MouseBinding Gesture="LeftClick"
+                                                                  Command="{Binding Source={StaticResource proxy}, Path=Data.ToggleTrackSelectionCommand}"
+                                                                  CommandParameter="{Binding}" />
+                                                </CheckBox.InputBindings>
+                                            </CheckBox>
+
                                             <!-- Track Image/Icon -->
-                                            <Border Grid.Column="0"
-                                                    Width="24"
-                                                    Height="24"
-                                                    CornerRadius="3"
-                                                    Background="#F0F0F0">
+                                            <Border Grid.Column="1"
+                                                    Width="32"
+                                                    Height="32"
+                                                    CornerRadius="4"
+                                                    Background="#F0F0F0"
+                                                    Margin="0,0,8,0">
                                                 <Image Source="{Binding ImageURL}"
                                                        Stretch="UniformToFill" />
                                             </Border>
 
                                             <!-- Track Info -->
-                                            <StackPanel Grid.Column="1"
-                                                        Margin="8,0">
+                                            <StackPanel Grid.Column="2"
+                                                        Margin="0,0,8,0"
+                                                        VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Title}"
-                                                           FontSize="12"
+                                                           FontSize="13"
                                                            FontWeight="SemiBold"
                                                            TextTrimming="CharacterEllipsis" />
                                                 <TextBlock FontSize="11"
-                                                           Foreground="#666666"
+                                                           Foreground="{StaticResource NeutralMediumGrayBrush}"
                                                            TextTrimming="CharacterEllipsis">
                                                     <Run Text="{Binding Artists[0].Name}" />
                                                     <Run Text="•" />
                                                     <Run Text="{Binding Album.Name}" />
                                                 </TextBlock>
+                                                <!-- Match details for found tracks -->
+                                                <TextBlock FontSize="9"
+                                                           Foreground="{StaticResource PrimaryGreenBrush}"
+                                                           TextTrimming="CharacterEllipsis"
+                                                           Visibility="{Binding IsLocal, Converter={StaticResource BoolToVis}}">
+                                                    <Run Text="{Binding MatchType}" />
+                                                    <Run Text="•" />
+                                                    <Run Text="{Binding MatchConfidence, Converter={x:Static conv:MatchConfidenceTextConverter.Instance}}" />
+                                                </TextBlock>
                                             </StackPanel>
 
-                                            <!-- Status Indicator -->
-                                            <Border Grid.Column="2"
+                                            <!-- Match Confidence Badge -->
+                                            <Border Grid.Column="3"
                                                     CornerRadius="10"
-                                                    Padding="8,4">
+                                                    Padding="8,4"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center"
+                                                    Background="{Binding MatchConfidence, Converter={x:Static conv:MatchConfidenceColorConverter.Instance}}"
+                                                    Visibility="{Binding IsLocal, Converter={StaticResource BoolToVis}}"
+                                                    ToolTip="{Binding MatchConfidence, Converter={x:Static conv:MatchConfidenceTooltipConverter.Instance}}">
+                                                <TextBlock FontSize="9"
+                                                           Foreground="White"
+                                                           FontWeight="Bold"
+                                                           Text="{Binding MatchConfidence, Converter={x:Static conv:MatchConfidenceTextConverter.Instance}}"
+                                                           VerticalAlignment="Center" />
+                                            </Border>
+
+                                            <!-- Status Indicator -->
+                                            <Border Grid.Column="4"
+                                                    CornerRadius="10"
+                                                    Padding="8,4"
+                                                    VerticalAlignment="Center">
                                                 <Border.Style>
                                                     <Style TargetType="Border">
                                                         <Style.Triggers>
@@ -406,31 +709,16 @@
                                                             <DataTrigger Binding="{Binding IsLocal}"
                                                                          Value="False">
                                                                 <Setter Property="Background"
-                                                                        Value="{StaticResource AccentRedBrush}" />
+                                                                        Value="{StaticResource ErrorBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
                                                 <TextBlock FontSize="10"
                                                            Foreground="White"
-                                                           VerticalAlignment="Center">
-                                                    <TextBlock.Style>
-                                                        <Style TargetType="TextBlock">
-                                                            <Style.Triggers>
-                                                                <DataTrigger Binding="{Binding IsLocal}"
-                                                                             Value="True">
-                                                                    <Setter Property="Text"
-                                                                            Value="✓ Available" />
-                                                                </DataTrigger>
-                                                                <DataTrigger Binding="{Binding IsLocal}"
-                                                                             Value="False">
-                                                                    <Setter Property="Text"
-                                                                            Value="✗ Missing" />
-                                                                </DataTrigger>
-                                                            </Style.Triggers>
-                                                        </Style>
-                                                    </TextBlock.Style>
-                                                </TextBlock>
+                                                           FontWeight="SemiBold"
+                                                           VerticalAlignment="Center"
+                                                           Text="{Binding IsLocal, Converter={x:Static conv:MatchConfidenceIconConverter.Instance}}" />
                                             </Border>
                                         </Grid>
                                     </Border>
@@ -440,17 +728,22 @@
                     </ScrollViewer>
 
                     <!-- Empty State -->
-                    <StackPanel Grid.Row="1"
+                    <StackPanel Grid.Row="2"
                                 HorizontalAlignment="Center"
                                 VerticalAlignment="Center"
                                 Visibility="{Binding PlaylistTracks.Count, Converter={x:Static conv:ZeroToVisibilityConverter.Instance}}">
                         <TextBlock Text="🎵"
-                                   FontSize="48"
+                                   FontSize="64"
                                    HorizontalAlignment="Center"
                                    Opacity="0.3" />
                         <TextBlock Text="Select a playlist to view tracks"
-                                   FontSize="14"
-                                   Foreground="#999999"
+                                   FontSize="16"
+                                   Foreground="{StaticResource NeutralMediumGrayBrush}"
+                                   HorizontalAlignment="Center"
+                                   Margin="0,16,0,0" />
+                        <TextBlock Text="Use Ctrl+A to select all tracks, Ctrl+Shift+A to deselect all"
+                                   FontSize="12"
+                                   Foreground="{StaticResource NeutralMediumGrayBrush}"
                                    HorizontalAlignment="Center"
                                    Margin="0,8,0,0" />
                     </StackPanel>
@@ -475,7 +768,7 @@
                                FontSize="12"
                                FontWeight="SemiBold"
                                Foreground="{StaticResource PrimaryGreenBrush}" />
-                    <TextBlock Text="Connect to Spotify to access your private playlists and get better matching"
+                    <TextBlock Text="Use keyboard shortcuts: Ctrl+A (select all), Ctrl+Shift+A (deselect all). Click tracks to toggle selection."
                                Style="{StaticResource DescriptionText}" />
                 </StackPanel>
 
@@ -484,7 +777,9 @@
                         Command="{Binding NextCommand}"
                         IsEnabled="{Binding IsNext}"
                         Style="{StaticResource PrimaryButton}"
-                        MinWidth="120" />
+                        MinWidth="140"
+                        Height="45"
+                        FontSize="14" />
             </Grid>
         </Border>
     </Grid>

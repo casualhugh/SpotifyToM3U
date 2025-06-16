@@ -67,8 +67,6 @@ namespace SpotifyToM3U.MVVM.Model
         public string CutName { get; set; } = string.Empty;
     }
 
-
-
     public partial class Tracks : ObservableObject
     {
         [JsonPropertyName("href")]
@@ -113,11 +111,6 @@ namespace SpotifyToM3U.MVVM.Model
         [JsonPropertyName("id")]
         public string Id { get; set; } = string.Empty;
 
-        public bool IsLocal { get => _isLocal; set => SetProperty(ref _isLocal, value); }
-        private bool _isLocal = false;
-        public string Path { get => _path; set => SetProperty(ref _path, value); }
-        private string _path = string.Empty;
-
         [JsonPropertyName("name")]
         public string Title { get => _title; set { CutTitle = IOManager.CutString(value); _title = value; } }
         public string _title = string.Empty;
@@ -125,6 +118,78 @@ namespace SpotifyToM3U.MVVM.Model
 
         [JsonPropertyName("uri")]
         public string Uri { get; set; } = string.Empty;
+
+        // Local matching properties
+        [JsonIgnore]
+        public bool IsLocal { get => _isLocal; set => SetProperty(ref _isLocal, value); }
+        private bool _isLocal = false;
+
+        [JsonIgnore]
+        public string Path { get => _path; set => SetProperty(ref _path, value); }
+        private string _path = string.Empty;
+
+        // Match confidence properties
+        [JsonIgnore]
+        public double MatchConfidence { get => _matchConfidence; set => SetProperty(ref _matchConfidence, value); }
+        private double _matchConfidence = 0.0;
+
+        [JsonIgnore]
+        public string MatchType { get => _matchType; set => SetProperty(ref _matchType, value); }
+        private string _matchType = string.Empty;
+
+        // Selection properties for export
+        [JsonIgnore]
+        public bool IsSelected { get => _isSelected; set => SetProperty(ref _isSelected, value); }
+        private bool _isSelected = true; // Default to selected for export
+
+        // Computed properties
+        [JsonIgnore]
+        public bool IsIncludedInExport => IsLocal && IsSelected;
+
+        [JsonIgnore]
+        public string MatchDescription => GenerateMatchDescription();
+
+        [JsonIgnore]
+        public bool HasStrongMatch => MatchConfidence >= 0.85;
+
+        [JsonIgnore]
+        public bool HasWeakMatch => IsLocal && MatchConfidence < 0.75;
+
+        [JsonIgnore]
+        public bool HasPerfectMatch => MatchConfidence >= 0.95;
+
+        [JsonIgnore]
+        public string ConfidenceLevel => MatchConfidence switch
+        {
+            >= 0.95 => "Perfect",
+            >= 0.85 => "Very Good",
+            >= 0.75 => "Good",
+            >= 0.65 => "Weak",
+            _ => "Very Weak"
+        };
+
+        [JsonIgnore]
+        public string StatusDescription => IsLocal switch
+        {
+            true when IsSelected => $"✅ Selected ({ConfidenceLevel})",
+            true when !IsSelected => $"☐ Excluded ({ConfidenceLevel})",
+            false => "❌ Missing"
+        };
+
+        private string GenerateMatchDescription()
+        {
+            if (!IsLocal)
+                return "No local match found";
+
+            return MatchConfidence switch
+            {
+                >= 0.95 => $"Perfect match ({MatchConfidence:P0}) - {MatchType}",
+                >= 0.85 => $"Very good match ({MatchConfidence:P0}) - {MatchType}",
+                >= 0.75 => $"Good match ({MatchConfidence:P0}) - {MatchType}",
+                >= 0.65 => $"Weak match ({MatchConfidence:P0}) - {MatchType}",
+                _ => $"Very weak match ({MatchConfidence:P0}) - May be incorrect"
+            };
+        }
     }
 
     public partial class Album : ObservableObject
@@ -160,5 +225,4 @@ namespace SpotifyToM3U.MVVM.Model
     {
         public static Tracks? FromJson(string json) => JsonSerializer.Deserialize<Tracks>(json);
     }
-
 }

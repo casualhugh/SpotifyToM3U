@@ -150,5 +150,52 @@ namespace SpotifyToM3U.MVVM.ViewModel
         }
 
         #endregion
+
+        #region Keyboard Shortcut Commands
+
+        [RelayCommand]
+        private void LibraryAddFolder()
+        {
+            LibraryVM libraryVM = App.Current.ServiceProvider.GetRequiredService<LibraryVM>();
+            if (libraryVM.AddFolderCommand.CanExecute(null))
+                libraryVM.AddFolderCommand.Execute(null);
+        }
+
+        [RelayCommand]
+        private void LibraryAddFile()
+        {
+            LibraryVM libraryVM = App.Current.ServiceProvider.GetRequiredService<LibraryVM>();
+            if (libraryVM.AddFileCommand.CanExecute(null))
+                libraryVM.AddFileCommand.Execute(null);
+        }
+
+        [RelayCommand]
+        private void Export()
+        {
+            if (EnableExport)
+            {
+                ExportVM exportVM = App.Current.ServiceProvider.GetRequiredService<ExportVM>();
+                if (exportVM.ExportCommand.CanExecute(null))
+                    exportVM.ExportCommand.Execute(null);
+            }
+        }
+
+        [RelayCommand]
+        private void RefreshSpotify()
+        {
+            SpotifyVM spotifyVM = App.Current.ServiceProvider.GetRequiredService<SpotifyVM>();
+            if (spotifyVM.IsAuthenticated && spotifyVM.LoadUserPlaylistsCommand.CanExecute(null))
+                spotifyVM.LoadUserPlaylistsCommand.Execute(null);
+        }
+
+        [RelayCommand]
+        private void Cancel()
+        {
+            LibraryVM libraryVM = App.Current.ServiceProvider.GetRequiredService<LibraryVM>();
+            if (libraryVM.ShowProgressBar && libraryVM.CancelOperationCommand.CanExecute(null))
+                libraryVM.CancelOperationCommand.Execute(null);
+        }
+
+        #endregion
     }
 }

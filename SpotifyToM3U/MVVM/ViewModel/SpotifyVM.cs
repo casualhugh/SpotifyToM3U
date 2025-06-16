@@ -7,6 +7,7 @@ using SpotifyToM3U.MVVM.Model;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -56,10 +57,29 @@ namespace SpotifyToM3U.MVVM.ViewModel
         }
     }
 
+    public enum TrackFilter
+    {
+        All,
+        FoundOnly,
+        MissingOnly,
+        WeakMatches,
+        PerfectMatches
+    }
+
     internal partial class SpotifyVM : ViewModelObject
     {
+        #region Fields
+
         private readonly ISpotifyService _spotifyService;
         private readonly LibraryVM _libraryVM;
+
+        // Store all tracks for filtering
+        private List<Track> _allTracks = new();
+        private List<TrackMatchResult> _allMatchResults = new();
+
+        #endregion
+
+        #region Observable Properties
 
         [ObservableProperty]
         private string _playlistIDText = string.Empty;
@@ -89,6 +109,9 @@ namespace SpotifyToM3U.MVVM.ViewModel
         private ObservableCollection<Track> _playlistTracks = new();
 
         [ObservableProperty]
+        private ObservableCollection<Track> _filteredTracks = new();
+
+        [ObservableProperty]
         private bool _showPlaylists = false;
 
         [ObservableProperty]
@@ -103,6 +126,33 @@ namespace SpotifyToM3U.MVVM.ViewModel
         [ObservableProperty]
         private string _playlistName = "Unknown Playlist";
 
+        // Match statistics
+        [ObservableProperty]
+        private int _perfectMatches = 0;
+
+        [ObservableProperty]
+        private int _goodMatches = 0;
+
+        [ObservableProperty]
+        private int _weakMatches = 0;
+
+        [ObservableProperty]
+        private int _missingTracks = 0;
+
+        // Export statistics
+        [ObservableProperty]
+        private int _selectedForExport = 0;
+
+        [ObservableProperty]
+        private int _excludedFromExport = 0;
+
+        [ObservableProperty]
+        private TrackFilter _currentFilter = TrackFilter.All;
+
+        #endregion
+
+        #region Constructor
+
         public SpotifyVM(INavigationService navigation) : base(navigation)
         {
             _spotifyService = App.Current.ServiceProvider.GetRequiredService<ISpotifyService>();
@@ -110,8 +160,10 @@ namespace SpotifyToM3U.MVVM.ViewModel
 
             _spotifyService.AuthenticationStateChanged += OnAuthenticationStateChanged;
             _libraryVM.AudioFilesModifified += LibraryVM_AudioFilesModified;
+            _libraryVM.PropertyChanged += LibraryVM_PropertyChanged;
 
             BindingOperations.EnableCollectionSynchronization(PlaylistTracks, new object());
+            BindingOperations.EnableCollectionSynchronization(FilteredTracks, new object());
             BindingOperations.EnableCollectionSynchronization(UserPlaylists, new object());
 
             // Initialize authentication state
@@ -124,9 +176,12 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 _ = LoadUserPlaylistsAsync();
             }
 
-            // Initialize playlist stats
             UpdatePlaylistStats();
         }
+
+        #endregion
+
+        #region Authentication Commands
 
         [RelayCommand]
         private async Task AuthenticateAsync()
@@ -194,6 +249,10 @@ namespace SpotifyToM3U.MVVM.ViewModel
             }
         }
 
+        #endregion
+
+        #region Playlist Loading Commands
+
         [RelayCommand]
         private async Task LoadPlaylistAsync(PlaylistInfo? playlist = null)
         {
@@ -207,29 +266,29 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 IsNext = false;
                 StatusMessage = $"Loading playlist: {playlist.Name}";
 
-                PlaylistTracks.Clear();
+                ClearCurrentPlaylist(); // This should clear everything
                 SelectedPlaylist = playlist;
 
                 List<Track> tracks = await LoadAllPlaylistTracksAsync(playlist.Id);
+                _allTracks = tracks;
+
+                // Make sure PlaylistTracks is completely clear before adding
+                PlaylistTracks.Clear();
 
                 foreach (Track track in tracks)
                 {
                     PlaylistTracks.Add(track);
                 }
 
-                // Update stats after loading tracks
                 UpdatePlaylistStats();
-
-                // Find local matches
-                await FindTracksLocalAsync(tracks);
-
-                // Update stats after finding local matches
+                await FindTracksWithConfidenceAsync(tracks);
                 UpdatePlaylistStats();
+                ApplyCurrentFilter();
 
                 if (PlaylistTracks.Any(x => x.IsLocal))
                 {
                     IsNext = true;
-                    StatusMessage = $"Loaded {PlaylistLength} tracks, found {PlaylistFound} locally";
+                    StatusMessage = $"Loaded {PlaylistLength} tracks, found {PlaylistFound} locally ({PerfectMatches} perfect matches)";
                 }
                 else
                 {
@@ -283,20 +342,171 @@ namespace SpotifyToM3U.MVVM.ViewModel
             }
         }
 
+        #endregion
+
+        #region Filter Commands
+
         [RelayCommand]
-        private void ToggleInputMode()
+        private void ShowAllTracks()
         {
-            ShowManualInput = !ShowManualInput;
+            CurrentFilter = TrackFilter.All;
+            ApplyCurrentFilter();
+            StatusMessage = $"Showing all {_allTracks.Count} tracks";
         }
+
+        [RelayCommand]
+        private void ShowFoundOnly()
+        {
+            CurrentFilter = TrackFilter.FoundOnly;
+            ApplyCurrentFilter();
+            int foundCount = _allTracks.Count(t => t.IsLocal);
+            StatusMessage = $"Showing {foundCount} found tracks";
+        }
+
+        [RelayCommand]
+        private void ShowMissingOnly()
+        {
+            CurrentFilter = TrackFilter.MissingOnly;
+            ApplyCurrentFilter();
+            int missingCount = _allTracks.Count(t => !t.IsLocal);
+            StatusMessage = $"Showing {missingCount} missing tracks";
+        }
+
+        [RelayCommand]
+        private void ShowWeakMatches()
+        {
+            CurrentFilter = TrackFilter.WeakMatches;
+            ApplyCurrentFilter();
+            StatusMessage = $"Showing {FilteredTracks.Count} tracks that need review - click tracks to exclude from export";
+        }
+
+        [RelayCommand]
+        private void ShowPerfectMatches()
+        {
+            CurrentFilter = TrackFilter.PerfectMatches;
+            ApplyCurrentFilter();
+            StatusMessage = $"Showing {PerfectMatches} perfect matches";
+        }
+
+        #endregion
+
+        #region Selection Commands
+
+        [RelayCommand]
+        private void ToggleTrackSelection(Track track)
+        {
+            if (track != null && track.IsLocal)
+            {
+                track.IsSelected = !track.IsSelected;
+                string status = track.IsSelected ? "included in" : "excluded from";
+                StatusMessage = $"Track {status} export: {track.Title}";
+                UpdateExportStats();
+            }
+        }
+
+        [RelayCommand]
+        private void DeselectAllVisibleTracks()
+        {
+            foreach (Track track in _allTracks)
+            {
+                track.IsSelected = false;
+            }
+            UpdateExportStats();
+            StatusMessage = "Deselected all tracks from export";
+        }
+
+        [RelayCommand]
+        private void SelectAllVisibleTracks()
+        {
+            foreach (Track track in _allTracks)
+            {
+                if (track.IsLocal)
+                    track.IsSelected = true;
+            }
+            UpdateExportStats();
+            StatusMessage = $"Selected all found tracks for export";
+        }
+
+        [RelayCommand]
+        private void SelectAllWeakMatches()
+        {
+            foreach (Track? track in _allTracks.Where(t => t.IsLocal && t.MatchConfidence < 0.75))
+            {
+                track.IsSelected = true;
+            }
+            UpdateExportStats();
+            StatusMessage = "Selected all weak matches for export";
+        }
+
+        [RelayCommand]
+        private void DeselectAllWeakMatches()
+        {
+            foreach (Track? track in _allTracks.Where(t => t.IsLocal && t.MatchConfidence < 0.75))
+            {
+                track.IsSelected = false;
+            }
+            UpdateExportStats();
+            StatusMessage = "Excluded all weak matches from export";
+        }
+
+        #endregion
+
+        #region Navigation Commands
 
         [RelayCommand]
         private void Next() => Navigation.NavigateTo<ExportVM>();
 
+        #endregion
+
+        #region Private Methods
+
         private void UpdatePlaylistStats()
         {
-            PlaylistLength = PlaylistTracks.Count;
-            PlaylistFound = PlaylistTracks.Count(x => x.IsLocal);
+            PlaylistLength = _allTracks.Count;
+            PlaylistFound = _allTracks.Count(x => x.IsLocal);
             PlaylistName = SelectedPlaylist?.Name ?? "Unknown Playlist";
+
+            // Calculate match quality statistics
+            PerfectMatches = _allTracks.Count(t => t.IsLocal && t.MatchConfidence >= 0.95);
+            GoodMatches = _allTracks.Count(t => t.IsLocal && t.MatchConfidence >= 0.75 && t.MatchConfidence < 0.95);
+            WeakMatches = _allTracks.Count(t => t.IsLocal && t.MatchConfidence < 0.75);
+            MissingTracks = _allTracks.Count(t => !t.IsLocal);
+
+            UpdateExportStats();
+        }
+
+        private void UpdateExportStats()
+        {
+            // Calculate export statistics
+            SelectedForExport = _allTracks.Count(t => t.IsIncludedInExport);
+            ExcludedFromExport = _allTracks.Count(t => t.IsLocal && !t.IsSelected);
+        }
+
+        private void ApplyCurrentFilter()
+        {
+            IEnumerable<Track> filteredList = CurrentFilter switch
+            {
+                TrackFilter.FoundOnly => _allTracks.Where(t => t.IsLocal),
+                TrackFilter.MissingOnly => _allTracks.Where(t => !t.IsLocal),
+                TrackFilter.WeakMatches => _allTracks.Where(t => t.IsLocal && t.MatchConfidence < 0.75),
+                TrackFilter.PerfectMatches => _allTracks.Where(t => t.IsLocal && t.MatchConfidence >= 0.95),
+                _ => _allTracks
+            };
+
+            FilteredTracks.Clear();
+            foreach (Track? track in filteredList)
+            {
+                FilteredTracks.Add(track);
+            }
+        }
+
+        private void ClearCurrentPlaylist()
+        {
+            PlaylistTracks.Clear();
+            FilteredTracks.Clear();
+            _allTracks.Clear();
+            _allMatchResults.Clear();
+            UpdatePlaylistStats();
         }
 
         private async Task<List<Track>> LoadAllPlaylistTracksAsync(string playlistId)
@@ -326,7 +536,10 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 CutTitle = IOManager.CutString(spotifyTrack.Name),
                 Uri = spotifyTrack.Uri,
                 IsLocal = false,
-                Path = string.Empty
+                Path = string.Empty,
+                MatchConfidence = 0.0,
+                MatchType = string.Empty,
+                IsSelected = true // Default to selected
             };
 
             // Set album
@@ -357,59 +570,33 @@ namespace SpotifyToM3U.MVVM.ViewModel
             return track;
         }
 
-        private async Task FindTracksLocalAsync(List<Track> spotifyTracks)
+        private async Task FindTracksWithConfidenceAsync(List<Track> spotifyTracks)
         {
             await Task.Run(() =>
             {
+                _allMatchResults.Clear();
+
                 foreach (Track track in spotifyTracks)
                 {
-                    IEnumerable<AudioFile> found = _libraryVM.AudioFiles.Where(audio =>
+                    // Use the comprehensive matcher
+                    TrackMatchResult? matchResult = ComprehensiveTrackMatcher.FindBestMatch(track, _libraryVM.AudioFiles);
+
+                    if (matchResult != null)
                     {
-                        double title = CalculateSimilarity(audio.CutTitle, track.CutTitle);
-                        if (title < 0.5)
-                            return false;
-
-                        string audioFirstArtist = audio.CutArtists.FirstOrDefault() ?? "";
-                        string trackFirstArtist = track.Artists.FirstOrDefault()?.CutName ?? "";
-
-                        double firstArtist = CalculateSimilarity(audioFirstArtist, trackFirstArtist);
-                        if (title + firstArtist > 1.5)
-                        {
-                            audio.TrackValueDictionary.TryAdd(track, title + firstArtist + 0.8);
-                            return true;
-                        }
-
-                        string audioSecondArtist = audio.CutArtists.Length > 1 ? audio.CutArtists[1] : "";
-                        string trackSecondArtist = track.Artists.Length > 1 ? track.Artists[1].CutName : "";
-
-                        double secondArtist = Math.Max(
-                            Math.Max(CalculateSimilarity(audioSecondArtist, trackSecondArtist),
-                                    CalculateSimilarity(audioSecondArtist, trackFirstArtist)),
-                            CalculateSimilarity(audioFirstArtist, trackSecondArtist));
-
-                        if (title + secondArtist > 1.5)
-                        {
-                            audio.TrackValueDictionary.TryAdd(track, title + secondArtist + 0.8);
-                            return true;
-                        }
-
-                        double album = CalculateSimilarity(audio.Album?.ToLower(), track.Album?.Name?.ToLower());
-                        if (title + album + Math.Max(firstArtist, secondArtist) > 2.2)
-                        {
-                            audio.TrackValueDictionary.TryAdd(track, album + title + Math.Max(firstArtist, secondArtist));
-                            return true;
-                        }
-
-                        return false;
-                    });
-
-                    if (found.Any())
-                    {
-                        AudioFile bestMatch = found.OrderBy(x =>
-                            x.TrackValueDictionary.TryGetValue(track, out double value) ? -value : 0).First();
-
                         track.IsLocal = true;
-                        track.Path = bestMatch.Location;
+                        track.Path = matchResult.AudioFile.Location;
+                        track.MatchConfidence = matchResult.Confidence;
+                        track.MatchType = matchResult.MatchType;
+
+                        _allMatchResults.Add(matchResult);
+
+                        Debug.WriteLine($"Match found: {track.Title} -> {matchResult.AudioFile.Title} (Confidence: {matchResult.Confidence:F2}, Type: {matchResult.MatchType})");
+                    }
+                    else
+                    {
+                        track.IsLocal = false;
+                        track.MatchConfidence = 0.0;
+                        track.MatchType = "No Match";
                     }
                 }
             });
@@ -433,45 +620,9 @@ namespace SpotifyToM3U.MVVM.ViewModel
             return string.Empty;
         }
 
-        private static double CalculateSimilarity(string? source, string? target)
-        {
-            if (string.IsNullOrWhiteSpace(source) || string.IsNullOrWhiteSpace(target))
-                return 0.0;
-            if (source == target)
-                return 1.0;
+        #endregion
 
-            int stepsToSame = LevenshteinDistance(source, target);
-            return 1.0 - (stepsToSame / (double)Math.Max(source.Length, target.Length));
-        }
-
-        private static int LevenshteinDistance(string source, string target)
-        {
-            if (source == target) return 0;
-            if (source.Length == 0) return target.Length;
-            if (target.Length == 0) return source.Length;
-
-            int[] v0 = new int[target.Length + 1];
-            int[] v1 = new int[target.Length + 1];
-
-            for (int i = 0; i < v0.Length; i++)
-                v0[i] = i;
-
-            for (int i = 0; i < source.Length; i++)
-            {
-                v1[0] = i + 1;
-
-                for (int j = 0; j < target.Length; j++)
-                {
-                    int cost = (source[i] == target[j]) ? 0 : 1;
-                    v1[j + 1] = Math.Min(v1[j] + 1, Math.Min(v0[j + 1] + 1, v0[j] + cost));
-                }
-
-                for (int j = 0; j < v0.Length; j++)
-                    v0[j] = v1[j];
-            }
-
-            return v1[target.Length];
-        }
+        #region Event Handlers
 
         private void OnAuthenticationStateChanged(object? sender, bool isAuthenticated)
         {
@@ -491,36 +642,46 @@ namespace SpotifyToM3U.MVVM.ViewModel
                     UserPlaylists.Clear();
                     ShowPlaylists = false;
                     SelectedPlaylist = null;
-                    PlaylistTracks.Clear();
+                    ClearCurrentPlaylist();
                     IsNext = false;
-
-                    // Reset playlist stats
-                    UpdatePlaylistStats();
                 }
             });
         }
 
         private void LibraryVM_AudioFilesModified(object? sender, EventArgs e)
         {
-            if (PlaylistTracks.Any())
+            if (_allTracks.Any())
             {
                 Task.Run(async () =>
                 {
                     IsLoading = true;
                     IsNext = false;
 
-                    await FindTracksLocalAsync(PlaylistTracks.ToList());
+                    await FindTracksWithConfidenceAsync(_allTracks);
 
                     Application.Current.Dispatcher.Invoke(() =>
                     {
                         UpdatePlaylistStats();
+                        ApplyCurrentFilter();
 
-                        if (PlaylistTracks.Any(x => x.IsLocal))
+                        if (_allTracks.Any(x => x.IsLocal))
+                        {
                             IsNext = true;
+                            StatusMessage = $"Re-matched: found {PlaylistFound} tracks ({PerfectMatches} perfect matches)";
+                        }
 
                         IsLoading = false;
                     });
                 });
+            }
+        }
+
+        private void LibraryVM_PropertyChanged(object? sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == nameof(LibraryVM.AudioFiles) && _allTracks.Any())
+            {
+                // Re-run matching when library changes
+                _ = Task.Run(async () => await FindTracksWithConfidenceAsync(_allTracks));
             }
         }
 
@@ -531,5 +692,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 _ = LoadPlaylistAsync(value);
             }
         }
+
+        #endregion
     }
 }
