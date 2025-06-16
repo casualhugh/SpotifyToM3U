@@ -1,73 +1,75 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
-  <PropertyGroup>
-    <OutputType>WinExe</OutputType>
-    <TargetFramework>net8.0-windows</TargetFramework>
-    <Nullable>enable</Nullable>
-    <UseWPF>true</UseWPF>
-    <Version>1.0.1</Version>
-    <UseWindowsForms>True</UseWindowsForms>
-    <ApplicationIcon>Recources\Images\spotify_icon.ico</ApplicationIcon>
-    <AssemblyName>Spotify to M3U</AssemblyName>
-  <Copyright>Shard 2023©</Copyright>
-  <Company>Shard</Company>
-  <Authors>Meyn</Authors>
-    <PublisherName>Shard</PublisherName>
-    <PackageIcon>spotify_icon.png</PackageIcon>
-    <IncludeSymbols>False</IncludeSymbols>
-    <PackageReadmeFile>README.md</PackageReadmeFile>
-    <RepositoryType>git</RepositoryType>
-    <PackageTags>spotify; playlist; m3u;</PackageTags>
-    <Description>A WPF application to convert spotify to m3u8 with your local audio library</Description>
-  </PropertyGroup>
+	<PropertyGroup>
+		<OutputType>WinExe</OutputType>
+		<TargetFramework>net8.0-windows</TargetFramework>
+		<Nullable>enable</Nullable>
+		<UseWPF>true</UseWPF>
+		<Version>1.0.1</Version>
+		<UseWindowsForms>True</UseWindowsForms>
+		<ApplicationIcon>Recources\Images\spotify_icon.ico</ApplicationIcon>
+		<AssemblyName>SpotifyToM3U</AssemblyName>
+		<Copyright>Shard 2025©</Copyright>
+		<Company>Shard</Company>
+		<Authors>TypNull</Authors>
+		<PublisherName>Shard</PublisherName>
+		<PackageIcon>spotify_icon.png</PackageIcon>
+		<IncludeSymbols>False</IncludeSymbols>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryType>git</RepositoryType>
+		<PackageTags>spotify; playlist; m3u;</PackageTags>
+		<Description>A WPF application to convert spotify to m3u8 with your local audio library</Description>
+		<NetCoreSdkVersion>8.0.404</NetCoreSdkVersion>
+		<MSBuildRuntimeVersion>8.0.404</MSBuildRuntimeVersion>
+	</PropertyGroup>
 
-  <ItemGroup>
-    <None Remove="Recources\Fonts\Dosis.ttf" />
-    <None Remove="Recources\Images\export.png" />
-    <None Remove="Recources\Images\library.png" />
-    <None Remove="Recources\Images\spotify.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<None Remove="Recources\Fonts\Dosis.ttf" />
+		<None Remove="Recources\Images\export.png" />
+		<None Remove="Recources\Images\library.png" />
+		<None Remove="Recources\Images\spotify.png" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <Content Include="Recources\Images\spotify_icon.ico">
-      <CopyToOutputDirectory>Never</CopyToOutputDirectory>
-    </Content>
-  </ItemGroup>
+	<ItemGroup>
+		<Content Include="Recources\Images\spotify_icon.ico">
+			<CopyToOutputDirectory>Never</CopyToOutputDirectory>
+		</Content>
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Include="..\README.md">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<None Include="..\README.md">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
-  <ItemGroup>
-    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
-    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
-    <PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
-    <PackageReference Include="Shard.DownloadAssistant" Version="1.1.0" />
-    <PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
-    <PackageReference Include="SpotifyAPI.Web.Auth" Version="7.2.1" />
-    <PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
-  </ItemGroup>
-	
-  <ItemGroup>
-    <Resource Include="Recources\Fonts\Dosis.ttf" />
-    <Resource Include="Recources\Images\export.png" />
-    <Resource Include="Recources\Images\library.png" />
-    <Resource Include="Recources\Images\spotify.png" />
-    <Resource Include="Recources\Images\spotify_icon.png" />
-  </ItemGroup>
+	<ItemGroup>
+		<PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+		<PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="9.0.6" />
+		<PackageReference Include="Microsoft.Xaml.Behaviors.Wpf" Version="1.1.135" />
+		<PackageReference Include="Shard.DownloadAssistant" Version="1.1.0" />
+		<PackageReference Include="SpotifyAPI.Web" Version="7.2.1" />
+		<PackageReference Include="SpotifyAPI.Web.Auth" Version="7.2.1" />
+		<PackageReference Include="taglib-sharp-netstandard2.0" Version="2.1.0" />
+	</ItemGroup>
 
-  <ItemGroup>
-    <None Update="Recources\Images\spotify_icon.ico">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-    <None Update="Recources\Images\spotify_icon.png">
-      <Pack>True</Pack>
-      <PackagePath>\</PackagePath>
-    </None>
-  </ItemGroup>
+	<ItemGroup>
+		<Resource Include="Recources\Fonts\Dosis.ttf" />
+		<Resource Include="Recources\Images\export.png" />
+		<Resource Include="Recources\Images\library.png" />
+		<Resource Include="Recources\Images\spotify.png" />
+		<Resource Include="Recources\Images\spotify_icon.png" />
+	</ItemGroup>
+
+	<ItemGroup>
+		<None Update="Recources\Images\spotify_icon.ico">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+		<None Update="Recources\Images\spotify_icon.png">
+			<Pack>True</Pack>
+			<PackagePath>\</PackagePath>
+		</None>
+	</ItemGroup>
 
 </Project>
