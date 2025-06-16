@@ -19,53 +19,7 @@
         WindowStartupLocation="CenterOwner">
 
     <Window.Resources>
-        <!-- Modern Input Field Style -->
-        <Style x:Key="ModernInputField"
-               TargetType="TextBox"
-               BasedOn="{StaticResource ModernTextBox}">
-            <Setter Property="Padding"
-                    Value="12,5" />
-            <Setter Property="FontSize"
-                    Value="13" />
-            <Setter Property="BorderBrush"
-                    Value="#E0E0E0" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="Background"
-                    Value="White" />
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused"
-                                     Value="True">
-                                <Setter Property="BorderBrush"
-                                        Value="#FF7CDC8F" />
-                                <Setter Property="BorderThickness"
-                                        Value="2" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
-                                <Setter Property="BorderBrush"
-                                        Value="#FF99CE9C" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern Button Style -->
+        <!-- Modern Dialog Button Style -->
         <Style x:Key="ModernDialogButton"
                TargetType="Button"
                BasedOn="{StaticResource MenuButtonStyle}">
@@ -83,22 +37,7 @@
                     Value="Hand" />
         </Style>
 
-        <!-- Label Style -->
-        <Style x:Key="ModernLabel"
-               TargetType="TextBlock">
-            <Setter Property="FontSize"
-                    Value="13" />
-            <Setter Property="FontWeight"
-                    Value="Medium" />
-            <Setter Property="Foreground"
-                    Value="#2E2E2E" />
-            <Setter Property="VerticalAlignment"
-                    Value="Center" />
-            <Setter Property="Margin"
-                    Value="0,0,0,6" />
-        </Style>
-
-        <!-- Checkbox Style -->
+        <!-- Modern Checkbox Style -->
         <Style x:Key="ModernCheckBox"
                TargetType="ToggleButton"
                BasedOn="{StaticResource ModernRadioButton}">
@@ -111,9 +50,8 @@
 
     <Border Background="White"
             CornerRadius="16"
-            BorderBrush="#E0E0E0"
+            BorderBrush="{StaticResource NeutralGrayBrush}"
             BorderThickness="1">
-
         <Grid>
             <Grid.RowDefinitions>
                 <RowDefinition Height="Auto" />
@@ -123,7 +61,7 @@
 
             <!-- Header -->
             <Border Grid.Row="0"
-                    Background="#FF99CE9C"
+                    Background="{StaticResource PrimaryGreenLightBrush}"
                     CornerRadius="16,16,0,0"
                     Padding="24,5"
                     MouseLeftButtonDown="OnHeaderMouseDown">
@@ -170,7 +108,7 @@
                                     <Trigger Property="IsMouseOver"
                                              Value="True">
                                         <Setter Property="Background"
-                                                Value="#FFE74C3C" />
+                                                Value="{StaticResource AccentRedBrush}" />
                                         <Setter Property="Opacity"
                                                 Value="1" />
                                     </Trigger>
@@ -192,9 +130,9 @@
 
                 <!-- Folder Path -->
                 <StackPanel Grid.Row="0"
-                            Margin="0,0,0,16">
+                            Style="{StaticResource SectionContainer}">
                     <TextBlock Text="📂 Folder Path"
-                               Style="{StaticResource ModernLabel}" />
+                               Style="{StaticResource FormLabel}" />
                     <Grid>
                         <Grid.ColumnDefinitions>
                             <ColumnDefinition Width="*" />
@@ -210,9 +148,7 @@
                         <Button Grid.Column="1"
                                 Content="📁 Browse"
                                 Command="{Binding BrowseCommand}"
-                                Background="#FF74C7EC"
-                                Tag="#FF37A3E6"
-                                BorderBrush="#FF37A3E6"
+                                Background="{StaticResource SecondaryBlueBrush}"
                                 Foreground="White"
                                 Style="{StaticResource ModernDialogButton}"
                                 MinWidth="80" />
@@ -221,16 +157,14 @@
 
                 <!-- File Extensions -->
                 <StackPanel Grid.Row="1"
-                            Margin="0,0,0,16">
+                            Style="{StaticResource SectionContainer}">
                     <TextBlock Text="🎵 File Extensions"
-                               Style="{StaticResource ModernLabel}" />
+                               Style="{StaticResource FormLabel}" />
                     <TextBox Text="{Binding Extensions, UpdateSourceTrigger=PropertyChanged}"
                              Style="{StaticResource ModernInputField}"
                              TabIndex="2" />
                     <TextBlock Text="Comma-separated list (e.g., mp3,flac,wav)"
-                               FontSize="11"
-                               Foreground="#666666"
-                               Margin="2,4,0,0" />
+                               Style="{StaticResource FormDescription}" />
                 </StackPanel>
 
                 <!-- Subdirectories Option -->
@@ -242,25 +176,20 @@
                                   TabIndex="3"
                                   Margin="0,0,12,0" />
                     <TextBlock Text="🔍 Include Subdirectories"
-                               FontSize="13"
-                               FontWeight="Medium"
-                               Foreground="#2E2E2E"
-                               VerticalAlignment="Center" />
+                               Style="{StaticResource FormLabel}" />
                 </StackPanel>
             </Grid>
 
             <!-- Footer -->
             <Border Grid.Row="2"
-                    Background="#F8F9FA"
+                    Background="{StaticResource NeutralLightGrayBrush}"
                     CornerRadius="0,0,16,16"
                     Padding="24,12">
                 <StackPanel Orientation="Horizontal"
                             HorizontalAlignment="Right">
                     <Button Content="❌ Cancel"
                             Command="{Binding QuitCommand}"
-                            Background="#FFFF6B6B"
-                            Tag="#FFE74C3C"
-                            BorderBrush="#FFE74C3C"
+                            Background="{StaticResource AccentRedBrush}"
                             Foreground="White"
                             Style="{StaticResource ModernDialogButton}"
                             Margin="0,0,12,0"
@@ -268,9 +197,7 @@
 
                     <Button Content="✅ Start Scan"
                             Command="{Binding ScanCommand}"
-                            Background="#FF7CDC8F"
-                            Tag="#FF50C668"
-                            BorderBrush="#FF50C668"
+                            Background="{StaticResource PrimaryGreenBrush}"
                             Foreground="White"
                             Style="{StaticResource ModernDialogButton}"
                             IsDefault="True"

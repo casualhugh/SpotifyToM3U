@@ -1,0 +1,95 @@
+﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!-- Define Colors First -->
+    <Color x:Key="PrimaryGreenColor">#FF7CDC8F</Color>
+    <Color x:Key="PrimaryGreenLightColor">#FF99CE9C</Color>
+    <Color x:Key="PrimaryGreenDarkColor">#FF50C668</Color>
+
+    <Color x:Key="SecondaryBlueColor">#FF74C7EC</Color>
+    <Color x:Key="SecondaryBlueDarkColor">#FF37A3E6</Color>
+
+    <Color x:Key="AccentRedColor">#FFFF6B6B</Color>
+    <Color x:Key="AccentRedDarkColor">#FFE74C3C</Color>
+    <Color x:Key="AccentOrangeColor">#FFFF9800</Color>
+
+    <Color x:Key="NeutralWhiteColor">#FFFFFFFF</Color>
+    <Color x:Key="NeutralLightGrayColor">#FFF8F9FA</Color>
+    <Color x:Key="NeutralGrayColor">#FFE0E0E0</Color>
+    <Color x:Key="NeutralMediumGrayColor">#FF666666</Color>
+    <Color x:Key="NeutralDarkGrayColor">#FF2E2E2E</Color>
+    <Color x:Key="NeutralBackgroundColor">#FFFAFAFA</Color>
+
+    <Color x:Key="SuccessColor">#FF76C575</Color>
+    <Color x:Key="WarningColor">#FFFF9800</Color>
+    <Color x:Key="ErrorColor">#FFF44336</Color>
+    <Color x:Key="InfoColor">#FF2196F3</Color>
+
+    <Color x:Key="HoverLightColor">#FFF8FFF8</Color>
+    <Color x:Key="SelectedLightColor">#FFE8F5E8</Color>
+
+    <!-- Primary Brand Colors as Brushes -->
+    <SolidColorBrush x:Key="PrimaryGreenBrush"
+                     Color="{StaticResource PrimaryGreenColor}" />
+    <SolidColorBrush x:Key="PrimaryGreenLightBrush"
+                     Color="{StaticResource PrimaryGreenLightColor}" />
+    <SolidColorBrush x:Key="PrimaryGreenDarkBrush"
+                     Color="{StaticResource PrimaryGreenDarkColor}" />
+
+    <!-- Secondary Colors -->
+    <SolidColorBrush x:Key="SecondaryBlueBrush"
+                     Color="{StaticResource SecondaryBlueColor}" />
+    <SolidColorBrush x:Key="SecondaryBlueDarkBrush"
+                     Color="{StaticResource SecondaryBlueDarkColor}" />
+
+    <!-- Accent Colors -->
+    <SolidColorBrush x:Key="AccentRedBrush"
+                     Color="{StaticResource AccentRedColor}" />
+    <SolidColorBrush x:Key="AccentRedDarkBrush"
+                     Color="{StaticResource AccentRedDarkColor}" />
+    <SolidColorBrush x:Key="AccentOrangeBrush"
+                     Color="{StaticResource AccentOrangeColor}" />
+
+    <!-- Neutral Colors -->
+    <SolidColorBrush x:Key="NeutralWhiteBrush"
+                     Color="{StaticResource NeutralWhiteColor}" />
+    <SolidColorBrush x:Key="NeutralLightGrayBrush"
+                     Color="{StaticResource NeutralLightGrayColor}" />
+    <SolidColorBrush x:Key="NeutralGrayBrush"
+                     Color="{StaticResource NeutralGrayColor}" />
+    <SolidColorBrush x:Key="NeutralMediumGrayBrush"
+                     Color="{StaticResource NeutralMediumGrayColor}" />
+    <SolidColorBrush x:Key="NeutralDarkGrayBrush"
+                     Color="{StaticResource NeutralDarkGrayColor}" />
+    <SolidColorBrush x:Key="NeutralBackgroundBrush"
+                     Color="{StaticResource NeutralBackgroundColor}" />
+
+    <!-- Transparent and Special Colors -->
+    <SolidColorBrush x:Key="TransparentBrush"
+                     Color="Transparent" />
+
+    <!-- State Colors -->
+    <SolidColorBrush x:Key="SuccessBrush"
+                     Color="{StaticResource SuccessColor}" />
+    <SolidColorBrush x:Key="WarningBrush"
+                     Color="{StaticResource WarningColor}" />
+    <SolidColorBrush x:Key="ErrorBrush"
+                     Color="{StaticResource ErrorColor}" />
+    <SolidColorBrush x:Key="InfoBrush"
+                     Color="{StaticResource InfoColor}" />
+
+    <!-- Hover and Focus Colors -->
+    <SolidColorBrush x:Key="HoverLightBrush"
+                     Color="{StaticResource HoverLightColor}" />
+    <SolidColorBrush x:Key="SelectedLightBrush"
+                     Color="{StaticResource SelectedLightColor}" />
+    <SolidColorBrush x:Key="FocusBrush"
+                     Color="{StaticResource PrimaryGreenColor}" />
+
+    <!-- Additional brushes for compatibility -->
+    <SolidColorBrush x:Key="ButtonSelectBrush"
+                     Color="{StaticResource PrimaryGreenLightColor}" />
+    <SolidColorBrush x:Key="DarkBrush"
+                     Color="{StaticResource NeutralDarkGrayColor}" />
+
+</ResourceDictionary>

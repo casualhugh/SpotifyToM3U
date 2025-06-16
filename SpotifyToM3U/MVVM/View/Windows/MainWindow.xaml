@@ -28,7 +28,7 @@
 
         <!-- Modern Navigation Button Style -->
         <Style x:Key="ModernNavigationButton"
-               TargetType="{x:Type RadioButton}">
+               TargetType="RadioButton">
             <Setter Property="Cursor"
                     Value="Hand" />
             <Setter Property="Height"
@@ -59,10 +59,10 @@
                     Value="{Binding ChangeViewCommand}" />
             <Setter Property="Template">
                 <Setter.Value>
-                    <ControlTemplate TargetType="{x:Type RadioButton}">
+                    <ControlTemplate TargetType="RadioButton">
                         <Border x:Name="Border"
                                 Background="Transparent"
-                                BorderBrush="#E0E0E0"
+                                BorderBrush="{StaticResource NeutralGrayBrush}"
                                 BorderThickness="1"
                                 CornerRadius="8"
                                 Padding="12,8">
@@ -86,7 +86,7 @@
                                            Text="{TemplateBinding Content}"
                                            FontSize="14"
                                            FontWeight="SemiBold"
-                                           Foreground="#2E2E2E"
+                                           Foreground="{StaticResource NeutralDarkGrayBrush}"
                                            VerticalAlignment="Center" />
                             </Grid>
                         </Border>
@@ -97,10 +97,10 @@
                                      Value="True">
                                 <Setter TargetName="Border"
                                         Property="Background"
-                                        Value="#F8FFF8" />
+                                        Value="{StaticResource HoverLightBrush}" />
                                 <Setter TargetName="Border"
                                         Property="BorderBrush"
-                                        Value="#FF99CE9C" />
+                                        Value="{StaticResource PrimaryGreenLightBrush}" />
                             </Trigger>
 
                             <!-- Selected state -->
@@ -108,10 +108,10 @@
                                      Value="True">
                                 <Setter TargetName="Border"
                                         Property="Background"
-                                        Value="#E8F5E8" />
+                                        Value="{StaticResource SelectedLightBrush}" />
                                 <Setter TargetName="Border"
                                         Property="BorderBrush"
-                                        Value="#FF7CDC8F" />
+                                        Value="{StaticResource PrimaryGreenBrush}" />
                                 <Setter TargetName="Border"
                                         Property="BorderThickness"
                                         Value="2" />
@@ -129,7 +129,6 @@
                 </Setter.Value>
             </Setter>
         </Style>
-
     </Window.Resources>
 
     <Grid>
@@ -141,7 +140,7 @@
         <!-- Navigation Tabs -->
         <Border Grid.Row="0"
                 Background="White"
-                BorderBrush="#E0E0E0"
+                BorderBrush="{StaticResource NeutralGrayBrush}"
                 BorderThickness="0,0,0,1"
                 Padding="20,15">
             <StackPanel Orientation="Horizontal">
@@ -166,7 +165,7 @@
 
         <!-- Content Area -->
         <Border Grid.Row="1"
-                Background="#FAFAFA"
+                Background="{StaticResource NeutralBackgroundBrush}"
                 CornerRadius="0,0,12,12">
             <ContentControl Content="{Binding Navigation.CurrentView}"
                             Margin="10" />

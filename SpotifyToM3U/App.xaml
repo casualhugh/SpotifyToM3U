@@ -4,27 +4,27 @@
              xmlns:local="clr-namespace:SpotifyToM3U"
              xmlns:view="clr-namespace:SpotifyToM3U.MVVM.View"
              xmlns:vm="clr-namespace:SpotifyToM3U.MVVM.ViewModel">
+
     <Application.Resources>
         <ResourceDictionary>
             <ResourceDictionary.MergedDictionaries>
-                <ResourceDictionary Source="/Styles/Window/ModernWindowStyleLight.xaml" />
-                <ResourceDictionary Source="/Styles/ModernScrollBarSytle.xaml" />
-                <ResourceDictionary Source="/Styles/MainMenuButtonStyle.xaml" />
-                <ResourceDictionary Source="/Styles/ButtonStyle.xaml" />
-                <ResourceDictionary Source="/Styles/ModernContextMenuStyle.xaml" />
-                <ResourceDictionary Source="/Styles/CheckBoxStyle.xaml" />
-                <ResourceDictionary Source="/Styles/ModernTextBoxStyle.xaml" />
-                <ResourceDictionary Source="/Styles/ModernDataGridStyle.xaml" />
+                <ResourceDictionary Source="/Styles/Colors.xaml" />
+                <ResourceDictionary Source="/Styles/Themes.xaml" />
             </ResourceDictionary.MergedDictionaries>
-            <DataTemplate DataType="{x:Type  vm:LibraryVM}">
+
+            <!-- View Model to View Mappings -->
+            <DataTemplate DataType="{x:Type vm:LibraryVM}">
                 <view:LibraryView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type  vm:SpotifyVM}">
+
+            <DataTemplate DataType="{x:Type vm:SpotifyVM}">
                 <view:SpotifyView />
             </DataTemplate>
-            <DataTemplate DataType="{x:Type  vm:ExportVM}">
+
+            <DataTemplate DataType="{x:Type vm:ExportVM}">
                 <view:ExportView />
             </DataTemplate>
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>

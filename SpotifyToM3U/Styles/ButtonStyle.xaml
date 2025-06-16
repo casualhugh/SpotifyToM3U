@@ -1,20 +1,26 @@
 ﻿<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
-    <Style x:Key="ButtonStyle" TargetType="Button" >
+
+    <!-- Basic Button Style -->
+    <Style x:Key="ButtonStyle"
+           TargetType="Button">
         <Setter Property="Cursor"
                 Value="Hand" />
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
                     <Border Background="{TemplateBinding Background}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
                     </Border>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
     </Style>
-    
-    <Style x:Key="MenuButtonStyle" TargetType="Button">
+
+    <!-- Fixed Menu Button Style -->
+    <Style x:Key="MenuButtonStyle"
+           TargetType="Button">
         <Setter Property="Cursor"
                 Value="Hand" />
         <Setter Property="IsEnabled"
@@ -22,37 +28,193 @@
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type Button}">
-                    <Border CornerRadius="5" BorderThickness="{TemplateBinding BorderThickness}" BorderBrush="{TemplateBinding BorderBrush}">
-                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
-                        <Border.Style>
-                            <Style TargetType="Border">
-
-                                <Setter Property="Padding"
-                                        Value="5,0" />
-                                <Setter Property="Background" Value="{Binding Path=Background, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                <Style.Triggers>
-                                    <DataTrigger Binding="{Binding Path=IsMouseOver, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
-                                        <Setter Property="Background" Value="{Binding Path=Tag, RelativeSource={RelativeSource AncestorType=Button}}"/>
-                                    </DataTrigger>
-                                    <DataTrigger Binding="{Binding Path=IsEnabled, RelativeSource={RelativeSource AncestorType=Button}}"
-                                                 Value="false">
-                                        <Setter Property="Opacity"
-                                                Value="0.3" />
-                                    </DataTrigger>
-                                </Style.Triggers>
-                                
-                            </Style>
-                            </Border.Style>
+                    <Border x:Name="ButtonBorder"
+                            CornerRadius="5"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            Background="{TemplateBinding Background}"
+                            Padding="5,0">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <!-- Natural hover effect - just brighten -->
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.8" />
+                        </Trigger>
+                        <!-- Natural press effect - just darken -->
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.6" />
+                        </Trigger>
+                        <!-- Disabled effect -->
+                        <Trigger Property="IsEnabled"
+                                 Value="False">
+                            <Setter Property="Opacity"
+                                    Value="0.3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
-        <Style.Triggers>
-            <Trigger Property="Tag"
-                     Value="False">
-                <Setter Property="IsEnabled"
-                        Value="False" />
-            </Trigger>
-        </Style.Triggers>
     </Style>
+
+    <!-- Fixed Primary Button -->
+    <Style x:Key="PrimaryButton"
+           TargetType="Button">
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="Background"
+                Value="{StaticResource PrimaryGreenBrush}" />
+        <Setter Property="Foreground"
+                Value="{StaticResource NeutralWhiteBrush}" />
+        <Setter Property="Height"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="13" />
+        <Setter Property="FontWeight"
+                Value="SemiBold" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder"
+                            CornerRadius="5"
+                            Background="{TemplateBinding Background}"
+                            Padding="5,0">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.6" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled"
+                                 Value="False">
+                            <Setter Property="Opacity"
+                                    Value="0.3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Fixed Secondary Button -->
+    <Style x:Key="SecondaryButton"
+           TargetType="Button">
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="Background"
+                Value="{StaticResource SecondaryBlueBrush}" />
+        <Setter Property="Foreground"
+                Value="{StaticResource NeutralWhiteBrush}" />
+        <Setter Property="Height"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="13" />
+        <Setter Property="FontWeight"
+                Value="SemiBold" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder"
+                            CornerRadius="5"
+                            Background="{TemplateBinding Background}"
+                            Padding="5,0">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.6" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled"
+                                 Value="False">
+                            <Setter Property="Opacity"
+                                    Value="0.3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
+    <!-- Fixed Danger Button -->
+    <Style x:Key="DangerButton"
+           TargetType="Button">
+        <Setter Property="Cursor"
+                Value="Hand" />
+        <Setter Property="Background"
+                Value="{StaticResource AccentRedBrush}" />
+        <Setter Property="Foreground"
+                Value="{StaticResource NeutralWhiteBrush}" />
+        <Setter Property="Height"
+                Value="40" />
+        <Setter Property="FontSize"
+                Value="13" />
+        <Setter Property="FontWeight"
+                Value="SemiBold" />
+        <Setter Property="BorderThickness"
+                Value="0" />
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="ButtonBorder"
+                            CornerRadius="5"
+                            Background="{TemplateBinding Background}"
+                            Padding="5,0">
+                        <ContentPresenter HorizontalAlignment="Center"
+                                          VerticalAlignment="Center" />
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.8" />
+                        </Trigger>
+                        <Trigger Property="IsPressed"
+                                 Value="True">
+                            <Setter TargetName="ButtonBorder"
+                                    Property="Opacity"
+                                    Value="0.6" />
+                        </Trigger>
+                        <Trigger Property="IsEnabled"
+                                 Value="False">
+                            <Setter Property="Opacity"
+                                    Value="0.3" />
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
 </ResourceDictionary>

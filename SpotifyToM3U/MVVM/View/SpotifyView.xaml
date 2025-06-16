@@ -17,38 +17,13 @@
         <core:BindingProxy x:Key="proxy"
                            Data="{Binding}" />
 
-        <!-- Modern Card Style -->
-        <Style x:Key="ModernCard"
-               TargetType="Border">
-            <Setter Property="Background"
-                    Value="White" />
-            <Setter Property="BorderBrush"
-                    Value="#E0E0E0" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="CornerRadius"
-                    Value="8" />
-            <Setter Property="Padding"
-                    Value="20,15" />
-            <Setter Property="Margin"
-                    Value="10,10,10,0" />
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="4"
-                                      Direction="270"
-                                      ShadowDepth="2"
-                                      Opacity="0.1" />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
         <!-- Playlist Item Style -->
         <Style x:Key="PlaylistItem"
                TargetType="Border">
             <Setter Property="Background"
                     Value="White" />
             <Setter Property="BorderBrush"
-                    Value="#E0E0E0" />
+                    Value="{StaticResource NeutralGrayBrush}" />
             <Setter Property="BorderThickness"
                     Value="1" />
             <Setter Property="CornerRadius"
@@ -61,16 +36,16 @@
                 <Trigger Property="IsMouseOver"
                          Value="True">
                     <Setter Property="Background"
-                            Value="#F8FFF8" />
+                            Value="{StaticResource HoverLightBrush}" />
                     <Setter Property="BorderBrush"
-                            Value="#FF99CE9C" />
+                            Value="{StaticResource PrimaryGreenLightBrush}" />
                 </Trigger>
                 <DataTrigger Binding="{Binding IsSelected}"
                              Value="True">
                     <Setter Property="Background"
-                            Value="#E8F5E8" />
+                            Value="{StaticResource SelectedLightBrush}" />
                     <Setter Property="BorderBrush"
-                            Value="#FF7CDC8F" />
+                            Value="{StaticResource PrimaryGreenBrush}" />
                     <Setter Property="BorderThickness"
                             Value="2" />
                 </DataTrigger>
@@ -97,53 +72,7 @@
                                       Opacity="0.3" />
                 </Setter.Value>
             </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver"
-                         Value="True">
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="1.05"
-                                            ScaleY="1.05" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsPressed"
-                         Value="True">
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="0.98"
-                                            ScaleY="0.98" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
         </Style>
-
-        <!-- Loading Animation -->
-        <Storyboard x:Key="LoadingAnimation"
-                    RepeatBehavior="Forever">
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(RotateTransform.Angle)"
-                             From="0"
-                             To="360"
-                             Duration="0:0:1.5">
-                <DoubleAnimation.EasingFunction>
-                    <CubicEase EasingMode="EaseInOut" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
-
-        <!-- Pulse Animation for Loading -->
-        <Storyboard x:Key="PulseAnimation"
-                    RepeatBehavior="Forever">
-            <DoubleAnimationUsingKeyFrames Storyboard.TargetProperty="Opacity">
-                <EasingDoubleKeyFrame KeyTime="0:0:0"
-                                      Value="0.5" />
-                <EasingDoubleKeyFrame KeyTime="0:0:1"
-                                      Value="1.0" />
-                <EasingDoubleKeyFrame KeyTime="0:0:2"
-                                      Value="0.5" />
-            </DoubleAnimationUsingKeyFrames>
-        </Storyboard>
     </UserControl.Resources>
 
     <Grid>
@@ -172,15 +101,11 @@
                                    Margin="0,0,8,0"
                                    VerticalAlignment="Center" />
                         <TextBlock Text="Spotify Integration"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="#FF7CDC8F"
-                                   VerticalAlignment="Center" />
+                                   Style="{StaticResource HeaderText}" />
                     </StackPanel>
 
                     <TextBlock Text="{Binding StatusMessage}"
-                               FontSize="12"
-                               Foreground="#666666"
+                               Style="{StaticResource DescriptionText}"
                                Margin="32,0,0,0" />
 
                     <StackPanel Orientation="Horizontal"
@@ -191,55 +116,31 @@
                         <TextBlock Text="{Binding CurrentUser}"
                                    FontSize="12"
                                    FontWeight="SemiBold"
-                                   Foreground="#FF7CDC8F" />
+                                   Foreground="{StaticResource PrimaryGreenBrush}" />
                     </StackPanel>
                 </StackPanel>
 
                 <!-- Auth Controls -->
                 <StackPanel Grid.Column="1"
                             Orientation="Horizontal">
-                    <!-- Improved Loading Indicator -->
+                    <!-- Loading Indicator -->
                     <Border Width="24"
                             Height="24"
                             Margin="0,0,12,0"
                             Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
-                            Background="#FF7CDC8F"
+                            Background="{StaticResource PrimaryGreenBrush}"
                             CornerRadius="12">
-                        <Grid>
-                            <Ellipse x:Name="LoadingRing1"
-                                     Width="16"
-                                     Height="16"
-                                     Stroke="White"
-                                     StrokeThickness="2"
-                                     Fill="Transparent"
-                                     RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform>
-                                    <RotateTransform />
-                                </Ellipse.RenderTransform>
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="Loaded">
-                                        <BeginStoryboard Storyboard="{StaticResource LoadingAnimation}" />
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                            <Ellipse Width="8"
-                                     Height="8"
-                                     Fill="White"
-                                     Opacity="0.8">
-                                <Ellipse.Triggers>
-                                    <EventTrigger RoutedEvent="Loaded">
-                                        <BeginStoryboard Storyboard="{StaticResource PulseAnimation}" />
-                                    </EventTrigger>
-                                </Ellipse.Triggers>
-                            </Ellipse>
-                        </Grid>
+                        <TextBlock Text="⟳"
+                                   FontSize="16"
+                                   Foreground="White"
+                                   HorizontalAlignment="Center"
+                                   VerticalAlignment="Center" />
                     </Border>
 
                     <!-- Auth Button -->
                     <Button Content="{Binding IsAuthenticated, Converter={x:Static conv:AuthButtonConverter.Instance}}"
                             Command="{Binding AuthenticateCommand}"
-                            Background="#FF7CDC8F"
-                            Tag="#FF50C668"
+                            Background="{StaticResource PrimaryGreenBrush}"
                             Foreground="White"
                             Style="{StaticResource SpotifyButton}"
                             MinWidth="120" />
@@ -248,8 +149,7 @@
                     <Button Content="🔄 Refresh"
                             Command="{Binding LoadUserPlaylistsCommand}"
                             Visibility="{Binding IsAuthenticated, Converter={StaticResource BoolToVis}}"
-                            Background="#FF99CE9C"
-                            Tag="#FF7CDC8F"
+                            Background="{StaticResource PrimaryGreenLightBrush}"
                             Foreground="White"
                             Style="{StaticResource SpotifyButton}"
                             Margin="8,0,0,0"
@@ -271,7 +171,7 @@
                     Style="{StaticResource ModernCard}"
                     Margin="0,0,4,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel>
+                    <StackPanel Style="{StaticResource SectionContainer}">
                         <!-- Mode Toggle -->
                         <StackPanel Orientation="Horizontal"
                                     Margin="0,0,0,12">
@@ -288,9 +188,7 @@
                         <!-- User Playlists -->
                         <StackPanel Visibility="{Binding ShowPlaylists, Converter={StaticResource BoolToVis}}">
                             <TextBlock Text="Your Playlists"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,8" />
+                                       Style="{StaticResource SectionHeaderText}" />
 
                             <ItemsControl ItemsSource="{Binding UserPlaylists}">
                                 <ItemsControl.ItemTemplate>
@@ -360,24 +258,19 @@
                         <!-- Manual Input -->
                         <StackPanel Visibility="{Binding ShowManualInput, Converter={StaticResource BoolToVis}}">
                             <TextBlock Text="Playlist URL or ID"
-                                       FontSize="14"
-                                       FontWeight="SemiBold"
-                                       Margin="0,0,0,8" />
+                                       Style="{StaticResource SectionHeaderText}" />
 
                             <TextBox Text="{Binding PlaylistIDText, UpdateSourceTrigger=PropertyChanged}"
+                                     Style="{StaticResource ModernInputField}"
                                      Height="32"
-                                     Margin="0,0,0,8"
-                                     VerticalContentAlignment="Center"
-                                     FontSize="12" />
+                                     Margin="0,0,0,8" />
 
                             <Button Content="🔍 Load Playlist"
                                     Command="{Binding LoadPlaylistByIdCommand}"
-                                    Background="#FF74C7EC"
-                                    Tag="#FF37A3E6"
+                                    Background="{StaticResource SecondaryBlueBrush}"
                                     Foreground="White"
                                     Style="{StaticResource SpotifyButton}"
-                                    HorizontalAlignment="Stretch" 
-                                    Margin="15,0,15,0"/>
+                                    HorizontalAlignment="Stretch" />
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
@@ -411,20 +304,20 @@
                                 <TextBlock Text="{Binding PlaylistName}"
                                            FontSize="16"
                                            FontWeight="Bold"
-                                           Foreground="#2E2E2E" />
+                                           Foreground="{StaticResource NeutralDarkGrayBrush}" />
                                 <StackPanel Orientation="Horizontal"
                                             Margin="0,4,0,0">
                                     <TextBlock FontSize="12"
-                                               Foreground="#666666">
+                                               Foreground="{StaticResource NeutralMediumGrayBrush}">
                                         <Run Text="{Binding PlaylistLength}" />
                                         <Run Text="tracks" />
                                     </TextBlock>
                                     <TextBlock Text="•"
                                                FontSize="12"
-                                               Foreground="#666666"
-                                               Margin="8,0" />
+                                               Margin="8,0"
+                                               Foreground="{StaticResource NeutralMediumGrayBrush}" />
                                     <TextBlock FontSize="12"
-                                               Foreground="#FF7CDC8F">
+                                               Foreground="{StaticResource PrimaryGreenBrush}">
                                         <Run Text="{Binding PlaylistFound}" />
                                         <Run Text="found locally" />
                                     </TextBlock>
@@ -432,9 +325,7 @@
                             </StackPanel>
 
                             <Border Grid.Column="1"
-                                    Background="#FF99CE9C"
-                                    CornerRadius="12"
-                                    Padding="8,4">
+                                    Style="{StaticResource ModernBadge}">
                                 <TextBlock FontSize="12"
                                            FontWeight="Bold"
                                            Foreground="White">
@@ -500,7 +391,7 @@
                                                 </TextBlock>
                                             </StackPanel>
 
-                                            <!-- Improved Status Indicator -->
+                                            <!-- Status Indicator -->
                                             <Border Grid.Column="2"
                                                     CornerRadius="10"
                                                     Padding="8,4">
@@ -510,38 +401,36 @@
                                                             <DataTrigger Binding="{Binding IsLocal}"
                                                                          Value="True">
                                                                 <Setter Property="Background"
-                                                                        Value="#FF7CDC8F" />
+                                                                        Value="{StaticResource SuccessBrush}" />
                                                             </DataTrigger>
                                                             <DataTrigger Binding="{Binding IsLocal}"
                                                                          Value="False">
                                                                 <Setter Property="Background"
-                                                                        Value="#FFFF6B6B" />
+                                                                        Value="{StaticResource AccentRedBrush}" />
                                                             </DataTrigger>
                                                         </Style.Triggers>
                                                     </Style>
                                                 </Border.Style>
-                                                <StackPanel Orientation="Horizontal">
-                                                    <TextBlock FontSize="10"
-                                                               Foreground="White"
-                                                               VerticalAlignment="Center">
-                                                        <TextBlock.Style>
-                                                            <Style TargetType="TextBlock">
-                                                                <Style.Triggers>
-                                                                    <DataTrigger Binding="{Binding IsLocal}"
-                                                                                 Value="True">
-                                                                        <Setter Property="Text"
-                                                                                Value="✓ Available" />
-                                                                    </DataTrigger>
-                                                                    <DataTrigger Binding="{Binding IsLocal}"
-                                                                                 Value="False">
-                                                                        <Setter Property="Text"
-                                                                                Value="✗ Missing" />
-                                                                    </DataTrigger>
-                                                                </Style.Triggers>
-                                                            </Style>
-                                                        </TextBlock.Style>
-                                                    </TextBlock>
-                                                </StackPanel>
+                                                <TextBlock FontSize="10"
+                                                           Foreground="White"
+                                                           VerticalAlignment="Center">
+                                                    <TextBlock.Style>
+                                                        <Style TargetType="TextBlock">
+                                                            <Style.Triggers>
+                                                                <DataTrigger Binding="{Binding IsLocal}"
+                                                                             Value="True">
+                                                                    <Setter Property="Text"
+                                                                            Value="✓ Available" />
+                                                                </DataTrigger>
+                                                                <DataTrigger Binding="{Binding IsLocal}"
+                                                                             Value="False">
+                                                                    <Setter Property="Text"
+                                                                            Value="✗ Missing" />
+                                                                </DataTrigger>
+                                                            </Style.Triggers>
+                                                        </Style>
+                                                    </TextBlock.Style>
+                                                </TextBlock>
                                             </Border>
                                         </Grid>
                                     </Border>
@@ -585,20 +474,16 @@
                     <TextBlock Text="💡 Tip: "
                                FontSize="12"
                                FontWeight="SemiBold"
-                               Foreground="#FF7CDC8F" />
+                               Foreground="{StaticResource PrimaryGreenBrush}" />
                     <TextBlock Text="Connect to Spotify to access your private playlists and get better matching"
-                               FontSize="12"
-                               Foreground="#666666" />
+                               Style="{StaticResource DescriptionText}" />
                 </StackPanel>
 
                 <Button Grid.Column="1"
                         Content="➡️ Next Step"
                         Command="{Binding NextCommand}"
                         IsEnabled="{Binding IsNext}"
-                        Background="#FF7CDC8F"
-                        Tag="#FF50C668"
-                        Foreground="White"
-                        Style="{StaticResource SpotifyButton}"
+                        Style="{StaticResource PrimaryButton}"
                         MinWidth="120" />
             </Grid>
         </Border>

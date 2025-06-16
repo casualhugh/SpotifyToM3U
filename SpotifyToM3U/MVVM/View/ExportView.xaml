@@ -12,146 +12,6 @@
 
     <UserControl.Resources>
         <BooleanToVisibilityConverter x:Key="BoolToVis" />
-
-        <!-- Modern Card Style -->
-        <Style x:Key="ModernCard"
-               TargetType="Border">
-            <Setter Property="Background"
-                    Value="White" />
-            <Setter Property="BorderBrush"
-                    Value="#E0E0E0" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="CornerRadius"
-                    Value="8" />
-            <Setter Property="Padding"
-                    Value="20,15" />
-            <Setter Property="Margin"
-                    Value="10,10,10,0" />
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="4"
-                                      Direction="270"
-                                      ShadowDepth="2"
-                                      Opacity="0.1" />
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Modern Action Button Style -->
-        <Style x:Key="ModernActionButton"
-               TargetType="Button"
-               BasedOn="{StaticResource MenuButtonStyle}">
-            <Setter Property="Height"
-                    Value="40" />
-            <Setter Property="FontSize"
-                    Value="13" />
-            <Setter Property="FontWeight"
-                    Value="SemiBold" />
-            <Setter Property="Margin"
-                    Value="0,0,12,0" />
-            <Setter Property="Cursor"
-                    Value="Hand" />
-            <Setter Property="Effect">
-                <Setter.Value>
-                    <DropShadowEffect BlurRadius="4"
-                                      Direction="270"
-                                      ShadowDepth="2"
-                                      Opacity="0.3" />
-                </Setter.Value>
-            </Setter>
-            <Style.Triggers>
-                <Trigger Property="IsMouseOver"
-                         Value="True">
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="1.05"
-                                            ScaleY="1.05" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-                <Trigger Property="IsPressed"
-                         Value="True">
-                    <Setter Property="RenderTransform">
-                        <Setter.Value>
-                            <ScaleTransform ScaleX="0.98"
-                                            ScaleY="0.98" />
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-
-        <!-- Modern Input Field Style -->
-        <Style x:Key="ModernInputField"
-               TargetType="TextBox">
-            <Setter Property="Padding"
-                    Value="12,8" />
-            <Setter Property="FontSize"
-                    Value="13" />
-            <Setter Property="BorderBrush"
-                    Value="#E0E0E0" />
-            <Setter Property="BorderThickness"
-                    Value="1" />
-            <Setter Property="Background"
-                    Value="White" />
-            <Setter Property="VerticalContentAlignment"
-                    Value="Center" />
-            <Setter Property="Template">
-                <Setter.Value>
-                    <ControlTemplate TargetType="TextBox">
-                        <Border Background="{TemplateBinding Background}"
-                                BorderBrush="{TemplateBinding BorderBrush}"
-                                BorderThickness="{TemplateBinding BorderThickness}"
-                                CornerRadius="6">
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
-                        </Border>
-                        <ControlTemplate.Triggers>
-                            <Trigger Property="IsFocused"
-                                     Value="True">
-                                <Setter Property="BorderBrush"
-                                        Value="#FF7CDC8F" />
-                                <Setter Property="BorderThickness"
-                                        Value="2" />
-                            </Trigger>
-                            <Trigger Property="IsMouseOver"
-                                     Value="True">
-                                <Setter Property="BorderBrush"
-                                        Value="#FF99CE9C" />
-                            </Trigger>
-                        </ControlTemplate.Triggers>
-                    </ControlTemplate>
-                </Setter.Value>
-            </Setter>
-        </Style>
-
-        <!-- Success Animation -->
-        <Storyboard x:Key="SuccessAnimation">
-            <DoubleAnimation Storyboard.TargetProperty="Opacity"
-                             From="0"
-                             To="1"
-                             Duration="0:0:0.5" />
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleX)"
-                             From="0.8"
-                             To="1"
-                             Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <BackEase EasingMode="EaseOut"
-                              Amplitude="0.3" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-            <DoubleAnimation Storyboard.TargetProperty="(UIElement.RenderTransform).(ScaleTransform.ScaleY)"
-                             From="0.8"
-                             To="1"
-                             Duration="0:0:0.5">
-                <DoubleAnimation.EasingFunction>
-                    <BackEase EasingMode="EaseOut"
-                              Amplitude="0.3" />
-                </DoubleAnimation.EasingFunction>
-            </DoubleAnimation>
-        </Storyboard>
     </UserControl.Resources>
 
     <Grid>
@@ -179,23 +39,16 @@
                                    Margin="0,0,8,0"
                                    VerticalAlignment="Center" />
                         <TextBlock Text="Export Playlist"
-                                   FontSize="18"
-                                   FontWeight="Bold"
-                                   Foreground="#FF7CDC8F"
-                                   VerticalAlignment="Center" />
+                                   Style="{StaticResource HeaderText}" />
                     </StackPanel>
                     <TextBlock Text="Export your matched playlist as an M3U file for use with any media player"
-                               FontSize="12"
-                               Foreground="#666666"
+                               Style="{StaticResource DescriptionText}"
                                Margin="32,0,0,0" />
                 </StackPanel>
 
                 <!-- Export Format Badge -->
                 <Border Grid.Column="1"
-                        Background="#FF99CE9C"
-                        CornerRadius="15"
-                        Padding="12,6"
-                        VerticalAlignment="Center">
+                        Style="{StaticResource ModernBadge}">
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Text="🎵"
                                    FontSize="14"
@@ -203,7 +56,7 @@
                         <TextBlock Text="M3U8 Format"
                                    FontWeight="Bold"
                                    FontSize="12"
-                                   Foreground="White" />
+                                   Foreground="{StaticResource NeutralWhiteBrush}" />
                     </StackPanel>
                 </Border>
             </Grid>
@@ -216,12 +69,9 @@
             <ScrollViewer VerticalScrollBarVisibility="Auto">
                 <StackPanel>
                     <!-- Export Location Section -->
-                    <StackPanel Margin="0,0,0,24">
+                    <StackPanel Style="{StaticResource SectionContainer}">
                         <TextBlock Text="📁 Export Location"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2E2E2E"
-                                   Margin="0,0,0,12" />
+                                   Style="{StaticResource SectionHeaderText}" />
 
                         <StackPanel>
                             <StackPanel.Style>
@@ -239,8 +89,7 @@
                             </StackPanel.Style>
 
                             <TextBlock Text="Choose where to save your playlist file"
-                                       FontSize="12"
-                                       Foreground="#666666"
+                                       Style="{StaticResource DescriptionText}"
                                        Margin="0,0,0,8" />
 
                             <Grid>
@@ -258,10 +107,7 @@
                                 <Button Grid.Column="1"
                                         Content="📁 Browse"
                                         Command="{Binding BrowseCommand}"
-                                        Style="{StaticResource ModernActionButton}"
-                                        Background="#FF74C7EC"
-                                        Tag="#FF37A3E6"
-                                        Foreground="White"
+                                        Style="{StaticResource SecondaryButton}"
                                         MinWidth="100"
                                         Margin="0" />
                             </Grid>
@@ -269,17 +115,14 @@
                     </StackPanel>
 
                     <!-- Export Options Section -->
-                    <StackPanel Margin="0,0,0,24">
+                    <StackPanel Style="{StaticResource SectionContainer}">
                         <TextBlock Text="⚙️ Export Options"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   Foreground="#2E2E2E"
-                                   Margin="0,0,0,12" />
+                                   Style="{StaticResource SectionHeaderText}" />
 
-                        <Border Background="#F8F9FA"
+                        <Border Background="{StaticResource NeutralLightGrayBrush}"
                                 CornerRadius="8"
-                                Padding="16"
-                                BorderBrush="#E0E0E0"
+                                Padding="{StaticResource LargePadding}"
+                                BorderBrush="{StaticResource NeutralGrayBrush}"
                                 BorderThickness="1">
                             <StackPanel Orientation="Horizontal"
                                         IsEnabled="{Binding CanAsRelativ}">
@@ -304,13 +147,9 @@
 
                                 <StackPanel>
                                     <TextBlock Text="🔗 Use Relative Paths"
-                                               FontSize="14"
-                                               FontWeight="Medium"
-                                               Foreground="#2E2E2E" />
+                                               Style="{StaticResource FormLabel}" />
                                     <TextBlock Text="Export with relative file paths for portable playlists"
-                                               FontSize="11"
-                                               Foreground="#666666"
-                                               Margin="0,2,0,0" />
+                                               Style="{StaticResource FormDescription}" />
                                 </StackPanel>
                             </StackPanel>
                         </Border>
@@ -318,20 +157,7 @@
 
                     <!-- Success Message -->
                     <Border Visibility="{Binding ExportIsVisible, Converter={StaticResource BoolToVis}}"
-                            Background="#FF7CDC8F"
-                            CornerRadius="12"
-                            Padding="20,16"
-                            Margin="0,16,0,0">
-                        <Border.RenderTransform>
-                            <ScaleTransform ScaleX="1"
-                                            ScaleY="1" />
-                        </Border.RenderTransform>
-                        <Border.Triggers>
-                            <EventTrigger RoutedEvent="Border.Loaded">
-                                <BeginStoryboard Storyboard="{StaticResource SuccessAnimation}" />
-                            </EventTrigger>
-                        </Border.Triggers>
-
+                            Style="{StaticResource SuccessNotification}">
                         <StackPanel Orientation="Horizontal"
                                     HorizontalAlignment="Center">
                             <TextBlock Text="✅"
@@ -342,11 +168,11 @@
                                 <TextBlock Text="Playlist Exported Successfully!"
                                            FontSize="16"
                                            FontWeight="Bold"
-                                           Foreground="White"
+                                           Foreground="{StaticResource NeutralWhiteBrush}"
                                            HorizontalAlignment="Center" />
                                 <TextBlock Text="Your M3U playlist file has been created and saved"
                                            FontSize="12"
-                                           Foreground="White"
+                                           Foreground="{StaticResource NeutralWhiteBrush}"
                                            Opacity="0.9"
                                            HorizontalAlignment="Center"
                                            Margin="0,4,0,0" />
@@ -373,20 +199,15 @@
                     <TextBlock Text="💡 Tip: "
                                FontSize="12"
                                FontWeight="SemiBold"
-                               Foreground="#FF7CDC8F" />
+                               Foreground="{StaticResource PrimaryGreenBrush}" />
                     <TextBlock Text="M3U8 files work with VLC, Windows Media Player, and most music applications"
-                               FontSize="12"
-                               Foreground="#666666" />
+                               Style="{StaticResource DescriptionText}" />
                 </StackPanel>
 
                 <Button Grid.Column="1"
                         Content="📤 Export Playlist"
                         Command="{Binding ExportCommand}"
-                        Style="{StaticResource ModernActionButton}"
-                        Background="#FF7CDC8F"
-                        Tag="#FF50C668"
-                        BorderBrush="#FF50C668"
-                        Foreground="White"
+                        Style="{StaticResource PrimaryButton}"
                         FontSize="16"
                         Height="45"
                         MinWidth="160"
