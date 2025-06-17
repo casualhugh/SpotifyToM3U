@@ -65,12 +65,27 @@ namespace SpotifyToM3U.MVVM.ViewModel
         }
 
         [RelayCommand]
+        private void CopyHttpsRedirectUri()
+        {
+            try
+            {
+                Clipboard.SetText("https://localhost:5000/callback");
+                StatusMessage = "HTTPS redirect URI copied to clipboard! Use this when creating your app.";
+            }
+            catch (Exception ex)
+            {
+                StatusMessage = $"Failed to copy to clipboard: {ex.Message}";
+                Debug.WriteLine($"Failed to copy to clipboard: {ex.Message}");
+            }
+        }
+
+        [RelayCommand]
         private void CopyRedirectUri()
         {
             try
             {
                 Clipboard.SetText("http://localhost:5000/callback");
-                StatusMessage = "Redirect URI copied to clipboard!";
+                StatusMessage = "HTTP redirect URI copied to clipboard! Edit your app to use this final URI.";
             }
             catch (Exception ex)
             {

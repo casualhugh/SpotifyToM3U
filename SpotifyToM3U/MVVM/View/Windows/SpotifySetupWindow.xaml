@@ -322,23 +322,48 @@
                                        FontSize="14"
                                        FontWeight="SemiBold"
                                        Margin="0,0,0,8" />
-                            <TextBlock Text="In your app settings, add this redirect URI:"
+                            <TextBlock Text="When creating your app, first use this HTTPS redirect URI:"
                                        FontSize="12"
                                        Foreground="#666666"
                                        Margin="0,0,0,4" />
 
-                            <!-- Selectable TextBox for the URL -->
+                            <!-- HTTPS URL for initial creation -->
+                            <TextBox Text="https://localhost:5000/callback"
+                                     Style="{StaticResource SelectableTextBox}"
+                                     Margin="0,4,0,8" />
+
+                            <TextBlock Text="⚠️ Important: After creating the app, edit it and change the redirect URI to HTTP:"
+                                       FontSize="12"
+                                       Foreground="#FF6B00"
+                                       FontWeight="Medium"
+                                       Margin="0,0,0,4" />
+
+                            <!-- Final HTTP URL -->
                             <TextBox Text="http://localhost:5000/callback"
                                      Style="{StaticResource SelectableTextBox}"
                                      Margin="0,4,0,8"
-                                     ToolTip="Click to select all text, then copy with Ctrl+C" />
+                                     ToolTip="This is the final redirect URI to use after creating your app" />
 
-                            <Button Content="📋 Copy Redirect URI"
-                                    Command="{Binding CopyRedirectUriCommand}"
-                                    Background="#74C7EC"
-                                    Foreground="White"
-                                    Style="{StaticResource ModernDialogButton}"
-                                    HorizontalAlignment="Left" />
+                            <TextBlock Text="This two-step process is required due to Spotify's security policies."
+                                       FontSize="11"
+                                       Foreground="#999999"
+                                       FontStyle="Italic"
+                                       Margin="0,0,0,8" />
+
+                            <StackPanel Orientation="Horizontal">
+                                <Button Content="📋 Copy HTTPS URI"
+                                        Command="{Binding CopyHttpsRedirectUriCommand}"
+                                        Background="#74C7EC"
+                                        Foreground="White"
+                                        Style="{StaticResource ModernDialogButton}"
+                                        Margin="0,0,8,0" />
+                                
+                                <Button Content="📋 Copy HTTP URI"
+                                        Command="{Binding CopyRedirectUriCommand}"
+                                        Background="#74C7EC"
+                                        Foreground="White"
+                                        Style="{StaticResource ModernDialogButton}" />
+                            </StackPanel>
                         </StackPanel>
                     </Grid>
 
