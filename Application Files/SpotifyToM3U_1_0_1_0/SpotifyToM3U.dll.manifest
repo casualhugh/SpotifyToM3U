@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <asmv1:assembly xsi:schemaLocation="urn:schemas-microsoft-com:asm.v1 assembly.adaptive.xsd" manifestVersion="1.0" xmlns:asmv1="urn:schemas-microsoft-com:asm.v1" xmlns="urn:schemas-microsoft-com:asm.v2" xmlns:asmv2="urn:schemas-microsoft-com:asm.v2" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:co.v1="urn:schemas-microsoft-com:clickonce.v1" xmlns:asmv3="urn:schemas-microsoft-com:asm.v3" xmlns:dsig="http://www.w3.org/2000/09/xmldsig#" xmlns:co.v2="urn:schemas-microsoft-com:clickonce.v2">
-  <asmv1:assemblyIdentity name="SpotifyToM3U.exe" version="1.0.0.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
+  <asmv1:assemblyIdentity name="SpotifyToM3U.exe" version="1.0.1.0" publicKeyToken="0000000000000000" language="neutral" processorArchitecture="msil" type="win32" />
   <description asmv2:iconFile="Recources\Images\spotify_icon.ico" xmlns="urn:schemas-microsoft-com:asm.v1">A WPF application to convert spotify to m3u8 with your local audio library</description>
   <application />
   <entryPoint>
@@ -168,7 +168,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>+hnR0GlW9Wsi5bm66rCmZCKXAXfVwYY1HYqR0/J1b4Q=</dsig:DigestValue>
+      <dsig:DigestValue>WSJWQ/xcFXcHm68nZFreZIeMskkIktGlkmQCMvT+mHQ=</dsig:DigestValue>
     </hash>
   </file>
   <file name="SpotifyToM3U.exe" size="262656">
@@ -177,7 +177,7 @@
         <dsig:Transform Algorithm="urn:schemas-microsoft-com:HashTransforms.Identity" />
       </dsig:Transforms>
       <dsig:DigestMethod Algorithm="http://www.w3.org/2000/09/xmldsig#sha256" />
-      <dsig:DigestValue>fq//Q8UVlybxbhX0yBE06xcN7BrWV1GdNBeV9/5QpYw=</dsig:DigestValue>
+      <dsig:DigestValue>ybz2lERdvd5pjfj6GXH5R9h1qKUB43CVwMTqCAeX8jc=</dsig:DigestValue>
     </hash>
   </file>
   <file name="SpotifyToM3U.runtimeconfig.json" size="525">
