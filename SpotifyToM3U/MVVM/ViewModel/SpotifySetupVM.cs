@@ -69,7 +69,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
         {
             try
             {
-                Clipboard.SetText("https://localhost:5000/callback");
+                Clipboard.SetText("https://127.0.0.1:5000/callback");
                 StatusMessage = "HTTPS redirect URI copied to clipboard! Use this when creating your app.";
             }
             catch (Exception ex)
@@ -84,7 +84,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
         {
             try
             {
-                Clipboard.SetText("http://localhost:5000/callback");
+                Clipboard.SetText("http://127.0.0.1:5000/callback");
                 StatusMessage = "HTTP redirect URI copied to clipboard! Edit your app to use this final URI.";
             }
             catch (Exception ex)
@@ -115,7 +115,7 @@ namespace SpotifyToM3U.MVVM.ViewModel
                 {
                     ClientId = ClientId.Trim(),
                     ClientSecret = ClientSecret.Trim(),
-                    RedirectUri = "http://localhost:5000/callback",
+                    RedirectUri = "http://127.0.0.1:5000/callback",
                     Scopes = new()
                     {
                         SpotifyAPI.Web.Scopes.PlaylistReadPrivate,
